@@ -492,7 +492,7 @@ y_coordinate = 0
 root.geometry(f"{screen_width}x{screen_height}+{x_coordinate}+{y_coordinate}")
 
 # Load Image
-image_path = "car.png"
+image_path = "assets/car.png"
 image = Image.open(image_path)
 
 width, height = 400, 300
@@ -511,7 +511,7 @@ image3.thumbnail((width3, height3))
 # Convert the image for Tkinter
 tk_image3 = ImageTk.PhotoImage(image3)
 
-logo_path = "logo.png"
+logo_path = "assets/logo.png"
 logo = Image.open(logo_path)
 Lwidth, Lheight = 300, 80
 logo.thumbnail((Lwidth, Lheight))
