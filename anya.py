@@ -1,7 +1,7 @@
 from dash import Dash, html, dcc, Output, Input
 
 app = Dash(__name__)
-
+#test
 # Initial layout with the button and image container
 app.layout = html.Div(children=[
     html.Div(id='output-image'),
