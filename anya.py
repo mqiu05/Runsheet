@@ -25,7 +25,7 @@ app.layout = html.Div(children=[
     Input('reveal-button', 'n_clicks')
 )
 def reveal_image(n_clicks):
-    if n_clicks > 0:
+    if n_clicks % 2 == 1:
         return html.Div([
             html.Img(
                 src='/assets/car.png', alt='Revealed Image',
