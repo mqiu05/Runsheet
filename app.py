@@ -53,7 +53,8 @@ app.layout = html.Div(children=[
     html.Div(children=[
         html.Button('Notes', id='notes-button', n_clicks=0,
                     style={'outline': 'none', 'border': 'none', 'background-color': 'white',
-                           'color': 'black', 'padding': '10px 20px', 'font-size': '25px', 'cursor': 'pointer', 'z-index': 2,
+                           'color': 'black', 'padding': '10px 20px', 'font-size': '25px', 'cursor': 'pointer',
+                           'z-index': 2,
                            'text-decoration': 'underline'}
                     ),
         html.Div(id='notes-inputs', children=[
@@ -69,9 +70,8 @@ app.layout = html.Div(children=[
     ], style={'margin-bottom': '20px'}),  # Ensure vertical space
 
     # Clear button
-    html.Button('Clear', id='clear-button', style={'margin-top': '20px'}),
+    html.Button('Clear', id='clear-button', style={'margin-top': '20px', 'margin-left': '20px', 'width':'8%',  'height': '40px','font-size': '20px','padding': '10px',}),
 ])
-
 
 
 @app.callback(
