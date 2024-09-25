@@ -4,10 +4,10 @@ app = Dash(__name__)
 #test
 # Initial layout with the button and image container
 app.layout = html.Div(children=[
-    html.Div(id='output-image'),
+    #html.Div(id='output-image'),
     html.Button(
         'Tires',
-        id='reveal-button',
+        id='tire-button',
         n_clicks=0,
         style={
             'outline': 'none', 'border': 'none', 'background-color': 'white',
@@ -15,16 +15,16 @@ app.layout = html.Div(children=[
             'z-index': 2, 'text-decoration': 'underline'
         }
     ),
-    html.Div(id='output-content', style={'position': 'relative'})  # Container for the image and grid
+    html.Div(id='output-tires', style={'position': 'relative'})  # Container for the image and grid
 ])
 
 
 # Callback to update the output-content div with an image and grid on button click
 @app.callback(
-    Output('output-content', 'children'),
-    Input('reveal-button', 'n_clicks')
+    Output('output-tires', 'children'),
+    Input('tire-button', 'n_clicks')
 )
-def reveal_image(n_clicks):
+def reveal_tire(n_clicks):
     if n_clicks % 2 == 1:
         return html.Div([
             html.Img(
