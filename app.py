@@ -3,66 +3,75 @@ from dash import Dash, html, dcc, Output, Input
 app = Dash(__name__, suppress_callback_exceptions=True)
 
 app.layout = html.Div(children=[
-    html.Button(
-        'General',
-        id='general-button',
-        n_clicks=0,
-        style={
-            'outline': 'none', 'border': 'none', 'background-color': 'white',
-            'color': 'black', 'padding': '10px 20px', 'font-size': '25px', 'cursor': 'pointer',
-            'z-index': 2, 'text-decoration': 'underline'
-        }
-    ),
-    html.Div(id='general-section', style={'display': 'none'}),  # Div that will be toggled
+    # General button and content
+    html.Div(children=[
+        html.Button(
+            'General',
+            id='general-button',
+            n_clicks=0,
+            style={
+                'outline': 'none', 'border': 'none', 'background-color': 'white',
+                'color': 'black', 'padding': '10px 20px', 'font-size': '25px', 'cursor': 'pointer',
+                'z-index': 2, 'text-decoration': 'underline'
+            }
+        ),
+        html.Div(id='general-section', style={'display': 'none'}),  # Div that will be toggled
 
-    # Input elements are always present but initially hidden
-    html.Div(id='session-inputs', children=[
-        html.Div('Session Number', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-        dcc.Input(placeholder='Session Number', type='number', value='', id='session', style={'width': '100%'}),
-        html.Div('Date', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-        dcc.DatePickerSingle(id='date-picker'),
-        html.Div('Venue', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-        dcc.Dropdown(['Purdue GP', 'Venue 2', 'Venue 3'], placeholder='Venue', id='venue'),
-        html.Div('Event', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-        dcc.Dropdown(['Skid', 'Brake', 'Autox'], placeholder='Event', id='event'),
-        html.Div('Driver', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-        dcc.Dropdown(['Iancarlo', 'Simon', 'Troy'], placeholder='Driver', id='driver'),
-        html.Div('Weight', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-        dcc.Input(placeholder='Weight', type='number', value='', id='weight', style={'width': '100%'}),
-    ], style={'display': 'none'}),  # Initially hidden
+        # Input elements for General section, initially hidden
+        html.Div(id='session-inputs', children=[
+            html.Div('Session Number', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
+            dcc.Input(placeholder='Session Number', type='number', value='', id='session', style={'width': '100%'}),
+            html.Div('Date', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
+            dcc.DatePickerSingle(id='date-picker'),
+            html.Div('Venue', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
+            dcc.Dropdown(['Purdue GP', 'Venue 2', 'Venue 3'], placeholder='Venue', id='venue'),
+            html.Div('Event', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
+            dcc.Dropdown(['Skid', 'Brake', 'Autox'], placeholder='Event', id='event'),
+            html.Div('Driver', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
+            dcc.Dropdown(['Iancarlo', 'Simon', 'Troy'], placeholder='Driver', id='driver'),
+            html.Div('Weight', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
+            dcc.Input(placeholder='Weight', type='number', value='', id='weight', style={'width': '100%'}),
+        ], style={'display': 'none'}),  # Initially hidden
+    ], style={'margin-bottom': '20px'}),  # Ensure vertical space between sections
 
-    html.Button(
-        'Tires',
-        id='tire-button',
-        n_clicks=0,
-        style={
-            'outline': 'none', 'border': 'none', 'background-color': 'white',
-            'color': 'black', 'padding': '10px 20px', 'font-size': '25px', 'cursor': 'pointer',
-            'z-index': 2, 'text-decoration': 'underline'
-        }
-    ),
-    html.Div(id='output-tires', style={'position': 'relative'}),
+    # Tires button and content
+    html.Div(children=[
+        html.Button(
+            'Tires',
+            id='tire-button',
+            n_clicks=0,
+            style={
+                'outline': 'none', 'border': 'none', 'background-color': 'white',
+                'color': 'black', 'padding': '10px 20px', 'font-size': '25px', 'cursor': 'pointer',
+                'z-index': 2, 'text-decoration': 'underline'
+            }
+        ),
+        html.Div(id='output-tires', style={'position': 'relative'}),
+    ], style={'margin-bottom': '20px'}),  # Ensure vertical space
 
-    html.Button('Notes', id='notes-button', n_clicks=0,
-                style={'outline': 'none', 'border': 'none', 'background-color': 'white',
-                       'color': 'black', 'padding': '10px 20px', 'font-size': '25px', 'cursor': 'pointer', 'z-index': 2,
-                       'text-decoration': 'underline'}
-                ),
+    # Notes button and content
+    html.Div(children=[
+        html.Button('Notes', id='notes-button', n_clicks=0,
+                    style={'outline': 'none', 'border': 'none', 'background-color': 'white',
+                           'color': 'black', 'padding': '10px 20px', 'font-size': '25px', 'cursor': 'pointer', 'z-index': 2,
+                           'text-decoration': 'underline'}
+                    ),
+        html.Div(id='notes-inputs', children=[
+            html.Div('Driver Notes', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
+            dcc.Textarea(placeholder='Driver Notes', value='', style={'width': '100%'}, id='driver-notes'),
+            html.Div('Faults', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
+            dcc.Textarea(placeholder='Faults', value='', style={'width': '100%'}, id='faults'),
+            html.Div('Improvements', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
+            dcc.Textarea(placeholder='Improvements', value='', style={'width': '100%'}, id='improvements'),
+            html.Div('Misc.', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
+            dcc.Textarea(placeholder='Misc. Notes', value='', style={'width': '100%'}, id='misc-notes'),
+        ], style={'display': 'none'}),
+    ], style={'margin-bottom': '20px'}),  # Ensure vertical space
 
-    # Notes inputs always present but hidden
-    html.Div(id='notes-inputs', children=[
-        html.Div('Driver Notes', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-        dcc.Textarea(placeholder='Driver Notes', value='', style={'width': '100%'}, id='driver-notes'),
-        html.Div('Faults', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-        dcc.Textarea(placeholder='Faults', value='', style={'width': '100%'}, id='faults'),
-        html.Div('Improvements', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-        dcc.Textarea(placeholder='Improvements', value='', style={'width': '100%'}, id='improvements'),
-        html.Div('Misc.', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-        dcc.Textarea(placeholder='Misc. Notes', value='', style={'width': '100%'}, id='misc-notes'),
-    ], style={'display': 'none'}),
-
+    # Clear button
     html.Button('Clear', id='clear-button', style={'margin-top': '20px'}),
 ])
+
 
 
 @app.callback(
