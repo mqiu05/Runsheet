@@ -167,7 +167,7 @@ def reveal_tire(n_clicks):
                 children=[html.Div('Tire Compound', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
                           dcc.Input(type='text', placeholder='', style={'width': '100%'}),
                           ],
-                style={'position': 'absolute', 'margin-top': '3000px}', 'margin-left': '1050px'})
+                style={'position': 'relative', 'margin-top': '3000px}', 'margin-left': '1050px'})
         ])
 
 
