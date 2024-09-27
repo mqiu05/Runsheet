@@ -5,6 +5,12 @@ app = Dash(__name__, suppress_callback_exceptions=True)
 app.layout = html.Div(children=[
     # General button and content
     html.Div(children=[
+        html.Img(
+                src='/assets/logo.png', alt='Revealed Image',
+            ),
+        html.Div('Session Number', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
+        dcc.Input(placeholder='Session Number', type='number', value='', id='session', style={'width': '100%'}),
+
         html.Button(
             'General',
             id='general-button',
@@ -19,8 +25,6 @@ app.layout = html.Div(children=[
 
         # Input elements for General section, initially hidden
         html.Div(id='session-inputs', children=[
-            html.Div('Session Number', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-            dcc.Input(placeholder='Session Number', type='number', value='', id='session', style={'width': '100%'}),
             html.Div('Date', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
             dcc.DatePickerSingle(id='date-picker'),
             html.Div('Venue', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
@@ -259,7 +263,7 @@ def reveal_notes(n_clicks):
      Output('faults', 'value'),
      Output('improvements', 'value'),
      Output('misc-notes', 'value')],
-    Input('clear-button', 'n_clicks')
+     Input('clear-button', 'n_clicks')
 )
 def clear_inputs(n_clicks):
     if n_clicks:
