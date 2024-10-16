@@ -1,8 +1,6 @@
+![Project Screenshot](./assets/logo.png)
+
 # Runsheet ReadMe
-
-Authors: Anya Pokrovskaya & Michelle Qiu
-
-Purdue Formula SAE - PF25
 
 ## Table of Contents
 - [Introduction](#introduction)
@@ -10,7 +8,9 @@ Purdue Formula SAE - PF25
 - [Installation & Usage](#installation)
 
 ## Introduction
-...
+Purdue Formula SAE - PF25
+
+Authors: Anya Pokrovskaya & Michelle Qiu
 
 ## Goals
 **1. Team:** Increase efficiency during testing and comp by creating a runsheet program that efficiently and effectively collects vehicle data across runs. To be used alongside Motec to supplement with additional data.
