@@ -5,7 +5,7 @@
 ## Table of Contents
 - [Introduction](#introduction)
 - [Goals](#goals)
-- [Directory] (#directory)
+- [Directory](#directory)
 - [Usage](#usage)
 
 ## Introduction
