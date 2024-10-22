@@ -5,10 +5,13 @@
 ## Table of Contents
 - [Introduction](#introduction)
 - [Goals](#goals)
-- [Installation & Usage](#installation)
+- [Directory](#directory)
+- [Usage](#usage)
 
 ## Introduction
 Purdue Formula SAE - PF25
+
+[Our Website](https://engineering.purdue.edu/fsae/wordpress/)
 
 Authors: Anya Pokrovskaya & Michelle Qiu
 
@@ -25,6 +28,15 @@ Authors: Anya Pokrovskaya & Michelle Qiu
   
 * **Understanding (~%25):** Allows for thorough collection of testing data to understand relations between various vehicle components. Used for learning the ins-and-outs of the car for future competitions and new members.
 
+## Directory
 
-## Installation
+| File Name   | Use + Content                       |
+| ----------- | ------------------------------------|
+| app.py      | Main file to run the program        | 
+| anya.py     | Anya's work in progress file        |
+| michelle.py | Michelle's work in progress file    |
+| old_code.py | Code from previous iteration (PF24) |
+| assets      | Folder that holds images            |
+
+## Usage
 To run, start by cloning this repository into a local IDE that supports Python (ex. PyCharm, VSCode). From there, run the **app.py** file, and open the local host link. 
