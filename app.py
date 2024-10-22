@@ -1,4 +1,5 @@
-from dash import Dash, html, dcc, Output, Input
+from dash import Dash, html, dcc, Output, Input, State
+import pandas as pd
 
 app = Dash(__name__)
 
@@ -193,9 +194,14 @@ app.layout = html.Div(children=[
 
     # Clear Button
     html.Button('Clear', id='clear-button',
-                style={'margin-top': '20px', 'margin-left': '20px', 'width': '8%', 'height': '40px',
-                       'font-size': '20px', 'padding': '10px', }
-                ),
+        style={'margin-top': '20px', 'margin-left': '20px', 'width': '8%', 'height': '40px',
+                'font-size': '20px', 'padding': '10px'}
+    ),
+
+    html.Button('Export', id='export-button',
+        style={'margin-top': '20px', 'margin-left': '20px', 'width': '8%', 'height': '40px',
+                'font-size': '20px', 'padding': '10px'}
+    )
 ])
 
 
@@ -282,7 +288,12 @@ def toggle_notes_section(n_clicks):
     prevent_initial_call=True
 )
 def clear_inputs(n_clicks):
-    return '', None, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
+    return ('', None, '', '', '', '',   # General
+            '', '', '', '', '', '', '', '', '',
+            '', '', '', '', '', '', '', '', '',
+            '', '', '', '', '', '', '', '', '',
+            '', '', '', '', '', '', '', '', '',
+            '', '', '', '', '') # Notes
 
 
 if __name__ == '__main__':
