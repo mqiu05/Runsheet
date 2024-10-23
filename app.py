@@ -177,6 +177,27 @@ app.layout = html.Div(children=[
         ], style={'display': 'none'}),
     ], style={'margin-bottom': '20px'}),
 
+    # Aero Section
+    html.Div(children=[
+        html.Button('Aero', id='aero-button', n_clicks=0, style=button_style),
+        html.Div(id='aero-inputs', children=[
+        ], style={'display': 'none'}),
+    ], style={'margin-bottom': '20px'}),
+
+    # Chassis Section
+    html.Div(children=[
+        html.Button('Chassis', id='chassis-button', n_clicks=0, style=button_style),
+        html.Div(id='chassis-inputs', children=[
+        ], style={'display': 'none'}),
+    ], style={'margin-bottom': '20px'}),
+
+    # Powertrain Section
+    html.Div(children=[
+        html.Button('Powertrain', id='powertrain-button', n_clicks=0, style=button_style),
+        html.Div(id='powertrain-inputs', children=[
+        ], style={'display': 'none'}),
+    ], style={'margin-bottom': '20px'}),
+
     # Notes Section
     html.Div(children=[
         html.Button('Notes', id='notes-button', n_clicks=0, style=button_style),
@@ -224,6 +245,33 @@ def toggle_general_section(n_clicks):
 def toggle_tires_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
+
+# Callback to toggle Aero section visibility
+@app.callback(
+    Output('aero-inputs', 'style'),
+    Input('aero-button', 'n_clicks'),
+    prevent_initial_call=True
+)
+def toggle_aero_section(n_clicks):
+    return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
+
+# Callback to toggle Chassis section visibility
+@app.callback(
+    Output('chassis-inputs', 'style'),
+    Input('chassis-button', 'n_clicks'),
+    prevent_initial_call=True
+)
+def toggle_chassis_section(n_clicks):
+    return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
+
+# Callback to toggle Powertrain section visibility
+@app.callback(
+    Output('powertrain-inputs', 'style'),
+    Input('powertrain-button', 'n_clicks'),
+    prevent_initial_call=True
+)
+def toggle_powertrain_section(n_clicks):
+    return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
 # Callback to toggle Notes section visibility
 @app.callback(
