@@ -1,5 +1,6 @@
 from dash import Dash, html, dcc, Output, Input, State
 import pandas as pd
+import os
 
 app = Dash(__name__)
 
@@ -332,8 +333,8 @@ def toggle_notes_section(n_clicks):
      Output('faults', 'value'),
      Output('improvements', 'value'),
      Output('misc-notes', 'value')],
-    Input('clear-button', 'n_clicks'),
-    prevent_initial_call=True
+     Input('clear-button', 'n_clicks'),
+     prevent_initial_call=True
 )
 def clear_inputs(n_clicks):
     return ('', None, '', '', '', '',   # General
@@ -342,6 +343,139 @@ def clear_inputs(n_clicks):
             '', '', '', '', '', '', '', '', '',
             '', '', '', '', '', '', '', '', '',
             '', '', '', '', '') # Notes
+
+
+# Callback to export all inputs
+@app.callback(
+    [State('session', 'value'),
+     State('date-picker', 'date'),
+     State('venue', 'value'),
+     State('event', 'value'),
+     State('driver', 'value'),
+     State('weight', 'value'),
+     State('fl-pressure-before', 'value'),
+     State('fl-pressure-after', 'value'),
+     State('fl-oTemp-before', 'value'),
+     State('fl-mTemp-before', 'value'),
+     State('fl-iTemp-before', 'value'),
+     State('fl-oTemp-after', 'value'),
+     State('fl-mTemp-after', 'value'),
+     State('fl-iTemp-after', 'value'),
+     State('fl-spring', 'value'),
+     State('fr-pressure-before', 'value'),
+     State('fr-pressure-after', 'value'),
+     State('fr-oTemp-before', 'value'),
+     State('fr-mTemp-before', 'value'),
+     State('fr-iTemp-before', 'value'),
+     State('fr-oTemp-after', 'value'),
+     State('fr-mTemp-after', 'value'),
+     State('fr-iTemp-after', 'value'),
+     State('fr-spring', 'value'),
+     State('rl-pressure-before', 'value'),
+     State('rl-pressure-after', 'value'),
+     State('rl-oTemp-before', 'value'),
+     State('rl-mTemp-before', 'value'),
+     State('rl-iTemp-before', 'value'),
+     State('rl-oTemp-after', 'value'),
+     State('rl-mTemp-after', 'value'),
+     State('rl-iTemp-after', 'value'),
+     State('rl-spring', 'value'),
+     State('rr-pressure-before', 'value'),
+     State('rr-pressure-after', 'value'),
+     State('rr-oTemp-before', 'value'),
+     State('rr-mTemp-before', 'value'),
+     State('rr-iTemp-before', 'value'),
+     State('rr-oTemp-after', 'value'),
+     State('rr-mTemp-after', 'value'),
+     State('rr-iTemp-after', 'value'),
+     State('rr-spring', 'value'),
+     State('tire-compound', 'value'),
+     State('driver-notes', 'value'),
+     State('faults', 'value'),
+     State('improvements', 'value'),
+     State('misc-notes', 'value')],
+     Input('export-button', 'n_clicks'),
+     prevent_initial_call=True
+)
+def export_inputs(n_clicks, session, date_picker, venue, event, driver, weight,
+                  fl_pressure_before, fl_pressure_after, fl_oTemp_before, fl_mTemp_before, fl_iTemp_before,
+                  fl_oTemp_after, fl_mTemp_after, fl_iTemp_after, fl_spring,
+                  fr_pressure_before, fr_pressure_after, fr_oTemp_before, fr_mTemp_before, fr_iTemp_before,
+                  fr_oTemp_after, fr_mTemp_after, fr_iTemp_after, fr_spring,
+                  rl_pressure_before, rl_pressure_after, rl_oTemp_before, rl_mTemp_before, rl_iTemp_before,
+                  rl_oTemp_after, rl_mTemp_after, rl_iTemp_after, rl_spring,
+                  rr_pressure_before, rr_pressure_after, rr_oTemp_before, rr_mTemp_before, rr_iTemp_before,
+                  rr_oTemp_after, rr_mTemp_after, rr_iTemp_after, rr_spring,
+                  tire_compound, driver_notes, faults, improvements, misc_notes):
+
+    # Create the data dictionary
+    data = {
+        'Session': session,
+        'Date': date_picker,
+        'Venue': venue,
+        'Event': event,
+        'Driver': driver,
+        'Weight': weight,
+        'FL Pressure Before': fl_pressure_before,
+        'FL Pressure After': fl_pressure_after,
+        'FL OTemp Before': fl_oTemp_before,
+        'FL MTemp Before': fl_mTemp_before,
+        'FL ITemp Before': fl_iTemp_before,
+        'FL OTemp After': fl_oTemp_after,
+        'FL MTemp After': fl_mTemp_after,
+        'FL ITemp After': fl_iTemp_after,
+        'FL Spring Rate': fl_spring,
+        'FR Pressure Before': fr_pressure_before,
+        'FR Pressure After': fr_pressure_after,
+        'FR OTemp Before': fr_oTemp_before,
+        'FR MTemp Before': fr_mTemp_before,
+        'FR ITemp Before': fr_iTemp_before,
+        'FR OTemp After': fr_oTemp_after,
+        'FR MTemp After': fr_mTemp_after,
+        'FR ITemp After': fr_iTemp_after,
+        'FR Spring Rate': fr_spring,
+        'RL Pressure Before': rl_pressure_before,
+        'RL Pressure After': rl_pressure_after,
+        'RL OTemp Before': rl_oTemp_before,
+        'RL MTemp Before': rl_mTemp_before,
+        'RL ITemp Before': rl_iTemp_before,
+        'RL OTemp After': rl_oTemp_after,
+        'RL MTemp After': rl_mTemp_after,
+        'RL ITemp After': rl_iTemp_after,
+        'RL Spring Rate': rl_spring,
+        'RR Pressure Before': rr_pressure_before,
+        'RR Pressure After': rr_pressure_after,
+        'RR OTemp Before': rr_oTemp_before,
+        'RR MTemp Before': rr_mTemp_before,
+        'RR ITemp Before': rr_iTemp_before,
+        'RR OTemp After': rr_oTemp_after,
+        'RR MTemp After': rr_mTemp_after,
+        'RR ITemp After': rr_iTemp_after,
+        'RR Spring Rate': rr_spring,
+        'Tire Compound': tire_compound,
+        'Driver Notes': driver_notes,
+        'Faults': faults,
+        'Improvements': improvements,
+        'Misc Notes': misc_notes
+    }
+
+    # Convert the dictionary to a pandas DataFrame
+    df = pd.DataFrame([data])
+
+    # Define the Excel file path
+    file_path = 'session_data.xlsx'
+
+    # Check if the file exists
+    if not os.path.exists(file_path):
+        # If file doesn't exist, create a new one and write the data
+        df.to_excel(file_path, index=False)
+    else:
+        # If file exists, append the data without overwriting the file
+        with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
+            df.to_excel(writer, index=False, header=False, startrow=writer.sheets['Sheet1'].max_row)
+
+    return None
+
 
 
 if __name__ == '__main__':
