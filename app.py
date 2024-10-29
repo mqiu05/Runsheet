@@ -31,8 +31,6 @@ app.layout = html.Div(children=[
             dcc.Dropdown(['Iancarlo', 'Simon', 'Troy', 'Matt'], placeholder='Driver', id='driver'),
             html.Div('Weight', style=label_style),
             dcc.Input(placeholder='Weight', type='number', value='', id='weight', style=input_style),
-            html.Div('Driver Notes', style=label_style),
-            dcc.Textarea(placeholder='Driver Notes', value='', style=input_style, id='driver-notes'),
         ], style={'display': 'none'}),
     ], style={'margin-bottom': '20px'}),
 
@@ -205,6 +203,8 @@ app.layout = html.Div(children=[
     html.Div(children=[
         html.Button('Notes', id='notes-button', n_clicks=0, style=button_style),
         html.Div(id='notes-inputs', children=[
+            html.Div('Driver Notes', style=label_style),
+            dcc.Textarea(placeholder='Driver Notes', value='', style=input_style, id='driver-notes'),
             html.Div('Faults', style=label_style),
             dcc.Textarea(placeholder='Faults', value='', style=input_style, id='faults'),
             html.Div('Improvements', style=label_style),
