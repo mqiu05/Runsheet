@@ -191,7 +191,7 @@ app.layout = html.Div(children=[
         ], style={'display': 'none'}),
     ], style={'margin-bottom': '20px'}),
 
-    # Powertrain Section
+    # Powertrain section
     html.Div(children=[
         html.Button('Powertrain', id='powertrain-button', n_clicks=0, style=button_style),
         html.Div(id='powertrain-inputs', children=[
