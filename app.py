@@ -230,30 +230,20 @@ app.layout = html.Div(children=[
                 html.Div(id='powertrain-inputs', children=[
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
+
             # Suspension Section
             html.Div(children=[
                 html.Button('Suspension', id='suspension-button', n_clicks=0, style=button_style),
                 html.Div(id='suspension-inputs', children=[
                     html.Div('Tire Compound', style=label_style),
-                    dcc.Textarea(placeholder='Tire Compound', value='', style={'width': '10%', 'height': '20px'},
+                    dcc.Input(placeholder='Tire Compound', value='', style={'width': '10%', 'height': '20px'},
                                  id='tire-compound'),
-                    html.Div(children=[
-                        html.Div('Front Spring Rate', style={'margin-right': '10px'}),
-                        dcc.Textarea(
-                            placeholder='Front Spring Rate',
-                            value='',
-                            style={'width': '10%', 'height': '20px'},
-                            id='front-spring-rate'
-                        ),
-                        html.Div('Rear Spring Rate', style={'margin': '0 10px'}),  # Adjust margin for spacing
-                        dcc.Textarea(
-                            placeholder='Rear Spring Rate',
-                            value='',
-                            style={'width': '10%', 'height': '20px'},
-                            id='rear-spring-rate'
-                        ),
-                    ], style={'display': 'flex', 'align-items': 'center', 'margin-top': '10px'}),
-                    # Flexbox for horizontal layout
+                    html.Div('Front Spring Rate', style={'margin-right': '10px'}),
+                    dcc.Input(placeholder='Front Spring Rate', value='', style={'width': '10%', 'height': '20px'},
+                                 id='front-spring-rate'),
+                    html.Div('Rear Spring Rate', style={'margin': '0 10px'}),  # Adjust margin for spacing
+                    dcc.Input(placeholder='Rear Spring Rate', value='', style={'width': '10%', 'height': '20px'},
+                                 id='rear-spring-rate')
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
 
@@ -304,7 +294,6 @@ app.layout = html.Div(children=[
 def toggle_general_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
-
 # Callback to toggle Tires section visibility
 @app.callback(
     Output('tires-inputs', 'style'),
@@ -313,7 +302,6 @@ def toggle_general_section(n_clicks):
 )
 def toggle_tires_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
-
 
 # Callback to toggle Aero section visibility
 @app.callback(
@@ -324,7 +312,6 @@ def toggle_tires_section(n_clicks):
 def toggle_aero_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
-
 # Callback to toggle Chassis section visibility
 @app.callback(
     Output('chassis-inputs', 'style'),
@@ -333,7 +320,6 @@ def toggle_aero_section(n_clicks):
 )
 def toggle_chassis_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
-
 
 # Callback to toggle Powertrain section visibility
 @app.callback(
@@ -350,7 +336,7 @@ def toggle_powertrain_section(n_clicks):
     Input('suspension-button', 'n_clicks'),
     prevent_initial_call=True
 )
-def toggle_powertrain_section(n_clicks):
+def toggle_suspension_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
 # Callback to toggle Notes section visibility
@@ -362,7 +348,6 @@ def toggle_powertrain_section(n_clicks):
 def toggle_notes_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
-
 # Callback to clear all inputs
 @app.callback(
     [
@@ -372,6 +357,7 @@ def toggle_notes_section(n_clicks):
         Output('event', 'value'),
         Output('driver', 'value'),
         Output('weight', 'value'),
+        Output('driver-notes', 'value'),
         Output('fl-pressure-before', 'value'),
         Output('fl-pressure-after', 'value'),
         Output('fl-oTemp-before', 'value'),
@@ -407,7 +393,6 @@ def toggle_notes_section(n_clicks):
         Output('tire-compound', 'value'),
         Output('front-spring-rate', 'value'),
         Output('rear-spring-rate', 'value'),
-        Output('driver-notes', 'value'),
         Output('faults', 'value'),
         Output('improvements', 'value'),
         Output('misc-notes', 'value')
@@ -421,7 +406,7 @@ def clear_inputs(n_clicks):
             '', '', '', '', '', '', '', '', '',  # FR Tire
             '', '', '', '', '', '', '', '', '',  # RL Tire
             '', '', '', '', '', '', '', '', '',  # RR Tire
-            '', '', '', '', '')  # Notes
+            '', '', '')  # Notes
 
 
 # Callback for exporting data to DataFrame and displaying it in a table
