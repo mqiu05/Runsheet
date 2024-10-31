@@ -441,7 +441,7 @@ def export_inputs(n_clicks, session, date_picker, venue, event, driver, weight,
                   rl_oTemp_after, rl_mTemp_after, rl_iTemp_after,
                   rr_pressure_before, rr_pressure_after, rr_oTemp_before, rr_mTemp_before, rr_iTemp_before,
                   rr_oTemp_after, rr_mTemp_after, rr_iTemp_after,
-                  tire_compound, front_spring_rate, driver_notes, faults, improvements, misc_notes):
+                  tire_compound, front_spring_rate, rear_spring_rate, driver_notes, faults, improvements, misc_notes):
 
     # Create the data dictionary
     data = {

@@ -83,8 +83,7 @@ app.layout = html.Div(children=[
                                               id='fl-mTemp-after'),
                                     dcc.Input(type='number', placeholder='', style={'width': '100%'},
                                               id='fl-iTemp-after'),
-                                    html.Div('Spring Rate', style={'grid-column': '1 / 2', 'font-weight': 'bold'}),
-                                    dcc.Input(type='number', placeholder='', style={'width': '100%'}, id='fl-spring')
+
                                 ],
                                 style={
                                     'position': 'absolute', 'margin-top': '40px', 'margin-left': '300px', 'left': '5%',
@@ -121,8 +120,7 @@ app.layout = html.Div(children=[
                                               id='fr-mTemp-after'),
                                     dcc.Input(type='number', placeholder='', style={'width': '100%'},
                                               id='fr-iTemp-after'),
-                                    html.Div('Spring Rate', style={'grid-column': '1 / 2', 'font-weight': 'bold'}),
-                                    dcc.Input(type='number', placeholder='', style={'width': '100%'}, id='fr-spring')
+
                                 ],
                                 style={
                                     'position': 'absolute', 'margin-top': '40px', 'margin-right': '300px',
@@ -160,8 +158,7 @@ app.layout = html.Div(children=[
                                               id='rl-mTemp-after'),
                                     dcc.Input(type='number', placeholder='', style={'width': '100%'},
                                               id='rl-iTemp-after'),
-                                    html.Div('Spring Rate', style={'grid-column': '1 / 2', 'font-weight': 'bold'}),
-                                    dcc.Input(type='number', placeholder='', style={'width': '100%'}, id='rl-spring')
+
                                 ],
                                 style={
                                     'position': 'absolute', 'bottom': '25%', 'left': '5%', 'margin-left': '300px',
@@ -198,8 +195,7 @@ app.layout = html.Div(children=[
                                               id='rr-mTemp-after'),
                                     dcc.Input(type='number', placeholder='', style={'width': '100%'},
                                               id='rr-iTemp-after'),
-                                    html.Div('Spring Rate', style={'grid-column': '1 / 2', 'font-weight': 'bold'}),
-                                    dcc.Input(type='number', placeholder='', style={'width': '100%'}, id='rr-spring')
+
                                 ],
                                 style={
                                     'position': 'absolute', 'bottom': '25%', 'right': '5%', 'margin-right': '300px',
@@ -210,15 +206,10 @@ app.layout = html.Div(children=[
                             ),
                         ], style={'position': 'relative', 'top': '-300px'}
                     ),
-                    html.Div(
-                        children=[
-                            html.Div('Tire Compound', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-                            dcc.Input(type='text', placeholder='', style={'width': '10%'}, id='tire-compound'),
-                        ],
-                        style={'position': 'relative', 'margin-left': '1050px'}
-                    )
+
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
+
             # Aero Section
             html.Div(children=[
                 html.Button('Aero', id='aero-button', n_clicks=0, style=button_style),
@@ -237,6 +228,32 @@ app.layout = html.Div(children=[
             html.Div(children=[
                 html.Button('Powertrain', id='powertrain-button', n_clicks=0, style=button_style),
                 html.Div(id='powertrain-inputs', children=[
+                ], style={'display': 'none'}),
+            ], style={'margin-bottom': '20px'}),
+            # Suspension Section
+            html.Div(children=[
+                html.Button('Suspension', id='suspension-button', n_clicks=0, style=button_style),
+                html.Div(id='suspension-inputs', children=[
+                    html.Div('Tire Compound', style=label_style),
+                    dcc.Textarea(placeholder='Tire Compound', value='', style={'width': '10%', 'height': '20px'},
+                                 id='tire-compound'),
+                    html.Div(children=[
+                        html.Div('Front Spring Rate', style={'margin-right': '10px'}),
+                        dcc.Textarea(
+                            placeholder='Front Spring Rate',
+                            value='',
+                            style={'width': '10%', 'height': '20px'},
+                            id='front-spring-rate'
+                        ),
+                        html.Div('Rear Spring Rate', style={'margin': '0 10px'}),  # Adjust margin for spacing
+                        dcc.Textarea(
+                            placeholder='Rear Spring Rate',
+                            value='',
+                            style={'width': '10%', 'height': '20px'},
+                            id='rear-spring-rate'
+                        ),
+                    ], style={'display': 'flex', 'align-items': 'center', 'margin-top': '10px'}),
+                    # Flexbox for horizontal layout
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
 
@@ -327,6 +344,14 @@ def toggle_chassis_section(n_clicks):
 def toggle_powertrain_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
+# Callback to toggle Suspension section visibility
+@app.callback(
+    Output('suspension-inputs', 'style'),
+    Input('suspension-button', 'n_clicks'),
+    prevent_initial_call=True
+)
+def toggle_powertrain_section(n_clicks):
+    return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
 # Callback to toggle Notes section visibility
 @app.callback(
@@ -355,7 +380,6 @@ def toggle_notes_section(n_clicks):
         Output('fl-oTemp-after', 'value'),
         Output('fl-mTemp-after', 'value'),
         Output('fl-iTemp-after', 'value'),
-        Output('fl-spring', 'value'),
         Output('fr-pressure-before', 'value'),
         Output('fr-pressure-after', 'value'),
         Output('fr-oTemp-before', 'value'),
@@ -364,7 +388,6 @@ def toggle_notes_section(n_clicks):
         Output('fr-oTemp-after', 'value'),
         Output('fr-mTemp-after', 'value'),
         Output('fr-iTemp-after', 'value'),
-        Output('fr-spring', 'value'),
         Output('rl-pressure-before', 'value'),
         Output('rl-pressure-after', 'value'),
         Output('rl-oTemp-before', 'value'),
@@ -373,7 +396,6 @@ def toggle_notes_section(n_clicks):
         Output('rl-oTemp-after', 'value'),
         Output('rl-mTemp-after', 'value'),
         Output('rl-iTemp-after', 'value'),
-        Output('rl-spring', 'value'),
         Output('rr-pressure-before', 'value'),
         Output('rr-pressure-after', 'value'),
         Output('rr-oTemp-before', 'value'),
@@ -382,8 +404,9 @@ def toggle_notes_section(n_clicks):
         Output('rr-oTemp-after', 'value'),
         Output('rr-mTemp-after', 'value'),
         Output('rr-iTemp-after', 'value'),
-        Output('rr-spring', 'value'),
         Output('tire-compound', 'value'),
+        Output('front-spring-rate', 'value'),
+        Output('rear-spring-rate', 'value'),
         Output('driver-notes', 'value'),
         Output('faults', 'value'),
         Output('improvements', 'value'),
@@ -425,7 +448,6 @@ def clear_inputs(n_clicks):
         State('fl-oTemp-after', 'value'),
         State('fl-mTemp-after', 'value'),
         State('fl-iTemp-after', 'value'),
-        State('fl-spring', 'value'),
         State('fr-pressure-before', 'value'),
         State('fr-pressure-after', 'value'),
         State('fr-oTemp-before', 'value'),
@@ -434,7 +456,6 @@ def clear_inputs(n_clicks):
         State('fr-oTemp-after', 'value'),
         State('fr-mTemp-after', 'value'),
         State('fr-iTemp-after', 'value'),
-        State('fr-spring', 'value'),
         State('rl-pressure-before', 'value'),
         State('rl-pressure-after', 'value'),
         State('rl-oTemp-before', 'value'),
@@ -443,7 +464,6 @@ def clear_inputs(n_clicks):
         State('rl-oTemp-after', 'value'),
         State('rl-mTemp-after', 'value'),
         State('rl-iTemp-after', 'value'),
-        State('rl-spring', 'value'),
         State('rr-pressure-before', 'value'),
         State('rr-pressure-after', 'value'),
         State('rr-oTemp-before', 'value'),
@@ -452,8 +472,9 @@ def clear_inputs(n_clicks):
         State('rr-oTemp-after', 'value'),
         State('rr-mTemp-after', 'value'),
         State('rr-iTemp-after', 'value'),
-        State('rr-spring', 'value'),
         State('tire-compound', 'value'),
+        State('front-spring-rate', 'value'),
+        State('rear-spring-rate', 'value'),
         State('faults', 'value'),
         State('improvements', 'value'),
         State('misc-notes', 'value')
@@ -462,14 +483,14 @@ def clear_inputs(n_clicks):
 )
 def export_data(n_clicks, session, date, venue, event, driver, weight, driver_notes,
                 fl_pressure_before, fl_pressure_after, fl_oTemp_before, fl_mTemp_before, fl_iTemp_before,
-                fl_oTemp_after, fl_mTemp_after, fl_iTemp_after, fl_spring,
+                fl_oTemp_after, fl_mTemp_after, fl_iTemp_after,
                 fr_pressure_before, fr_pressure_after, fr_oTemp_before, fr_mTemp_before, fr_iTemp_before,
-                fr_oTemp_after, fr_mTemp_after, fr_iTemp_after, fr_spring,
+                fr_oTemp_after, fr_mTemp_after, fr_iTemp_after,
                 rl_pressure_before, rl_pressure_after, rl_oTemp_before, rl_mTemp_before, rl_iTemp_before,
-                rl_oTemp_after, rl_mTemp_after, rl_iTemp_after, rl_spring,
+                rl_oTemp_after, rl_mTemp_after, rl_iTemp_after,
                 rr_pressure_before, rr_pressure_after, rr_oTemp_before, rr_mTemp_before, rr_iTemp_before,
-                rr_oTemp_after, rr_mTemp_after, rr_iTemp_after, rr_spring,
-                tire_compound,
+                rr_oTemp_after, rr_mTemp_after, rr_iTemp_after,
+                tire_compound, front_spring_rate, rear_spring_rate,
                 faults, improvements, misc_notes):
     global session_data
     if not n_clicks:
@@ -497,7 +518,6 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
         'FL O Temp After': fl_oTemp_after,
         'FL M Temp After': fl_mTemp_after,
         'FL I Temp After': fl_iTemp_after,
-        'FL Spring Rate': fl_spring,
         # FR Tire Data
         'FR Pressure Before': fr_pressure_before,
         'FR Pressure After': fr_pressure_after,
@@ -507,7 +527,7 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
         'FR O Temp After': fr_oTemp_after,
         'FR M Temp After': fr_mTemp_after,
         'FR I Temp After': fr_iTemp_after,
-        'FR Spring Rate': fr_spring,
+
         # RL Tire Data
         'RL Pressure Before': rl_pressure_before,
         'RL Pressure After': rl_pressure_after,
@@ -517,7 +537,6 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
         'RL O Temp After': rl_oTemp_after,
         'RL M Temp After': rl_mTemp_after,
         'RL I Temp After': rl_iTemp_after,
-        'RL Spring Rate': rl_spring,
         # RR Tire Data
         'RR Pressure Before': rr_pressure_before,
         'RR Pressure After': rr_pressure_after,
@@ -527,9 +546,11 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
         'RR O Temp After': rr_oTemp_after,
         'RR M Temp After': rr_mTemp_after,
         'RR I Temp After': rr_iTemp_after,
-        'RR Spring Rate': rr_spring,
-        # Tire Compound
+
+        # Suspension
         'Tire Compound': tire_compound,
+        'Front Spring Rate': front_spring_rate,
+        'Rear Spring Rate': rear_spring_rate,
         # Notes
         'Faults': faults,
         'Improvements': improvements,
