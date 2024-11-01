@@ -4,8 +4,6 @@ import pandas as pd
 
 app = Dash(__name__)
 
-session_data = pd.DataFrame()
-
 # Define common styles
 button_style = {
     'outline': 'none', 'border': 'none', 'background-color': 'white', 'color': 'black',
@@ -83,8 +81,7 @@ app.layout = html.Div(children=[
                                               id='fl-mTemp-after'),
                                     dcc.Input(type='number', placeholder='', style={'width': '100%'},
                                               id='fl-iTemp-after'),
-                                    html.Div('Spring Rate', style={'grid-column': '1 / 2', 'font-weight': 'bold'}),
-                                    dcc.Input(type='number', placeholder='', style={'width': '100%'}, id='fl-spring')
+
                                 ],
                                 style={
                                     'position': 'absolute', 'margin-top': '40px', 'margin-left': '300px', 'left': '5%',
@@ -121,8 +118,7 @@ app.layout = html.Div(children=[
                                               id='fr-mTemp-after'),
                                     dcc.Input(type='number', placeholder='', style={'width': '100%'},
                                               id='fr-iTemp-after'),
-                                    html.Div('Spring Rate', style={'grid-column': '1 / 2', 'font-weight': 'bold'}),
-                                    dcc.Input(type='number', placeholder='', style={'width': '100%'}, id='fr-spring')
+
                                 ],
                                 style={
                                     'position': 'absolute', 'margin-top': '40px', 'margin-right': '300px',
@@ -160,8 +156,7 @@ app.layout = html.Div(children=[
                                               id='rl-mTemp-after'),
                                     dcc.Input(type='number', placeholder='', style={'width': '100%'},
                                               id='rl-iTemp-after'),
-                                    html.Div('Spring Rate', style={'grid-column': '1 / 2', 'font-weight': 'bold'}),
-                                    dcc.Input(type='number', placeholder='', style={'width': '100%'}, id='rl-spring')
+
                                 ],
                                 style={
                                     'position': 'absolute', 'bottom': '25%', 'left': '5%', 'margin-left': '300px',
@@ -198,8 +193,7 @@ app.layout = html.Div(children=[
                                               id='rr-mTemp-after'),
                                     dcc.Input(type='number', placeholder='', style={'width': '100%'},
                                               id='rr-iTemp-after'),
-                                    html.Div('Spring Rate', style={'grid-column': '1 / 2', 'font-weight': 'bold'}),
-                                    dcc.Input(type='number', placeholder='', style={'width': '100%'}, id='rr-spring')
+
                                 ],
                                 style={
                                     'position': 'absolute', 'bottom': '25%', 'right': '5%', 'margin-right': '300px',
@@ -210,15 +204,10 @@ app.layout = html.Div(children=[
                             ),
                         ], style={'position': 'relative', 'top': '-300px'}
                     ),
-                    html.Div(
-                        children=[
-                            html.Div('Tire Compound', style={'grid-column': '1 / 3', 'font-weight': 'bold'}),
-                            dcc.Input(type='text', placeholder='', style={'width': '10%'}, id='tire-compound'),
-                        ],
-                        style={'position': 'relative', 'margin-left': '1050px'}
-                    )
+
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
+
             # Aero Section
             html.Div(children=[
                 html.Button('Aero', id='aero-button', n_clicks=0, style=button_style),
@@ -237,6 +226,22 @@ app.layout = html.Div(children=[
             html.Div(children=[
                 html.Button('Powertrain', id='powertrain-button', n_clicks=0, style=button_style),
                 html.Div(id='powertrain-inputs', children=[
+                ], style={'display': 'none'}),
+            ], style={'margin-bottom': '20px'}),
+
+            # Suspension Section
+            html.Div(children=[
+                html.Button('Suspension', id='suspension-button', n_clicks=0, style=button_style),
+                html.Div(id='suspension-inputs', children=[
+                    html.Div('Tire Compound', style=label_style),
+                    dcc.Input(placeholder='Tire Compound', value='', style={'width': '10%', 'height': '20px'},
+                                 id='tire-compound'),
+                    html.Div('Front Spring Rate', style={'margin-right': '10px'}),
+                    dcc.Input(placeholder='Front Spring Rate', value='', style={'width': '10%', 'height': '20px'},
+                                 id='front-spring-rate'),
+                    html.Div('Rear Spring Rate', style={'margin': '0 10px'}),  # Adjust margin for spacing
+                    dcc.Input(placeholder='Rear Spring Rate', value='', style={'width': '10%', 'height': '20px'},
+                                 id='rear-spring-rate')
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
 
@@ -267,14 +272,24 @@ app.layout = html.Div(children=[
         ]),
 
         dcc.Tab(label='Data Table', children=[
-            # Container for Data Table Display
-            html.Div(id='data-table-container'),
+            # DataTable
+            dash_table.DataTable(
+                id='editable-table',
+                columns=[],
+                data=[],
+                editable=True,  # Enable editing
+                style_table={'overflowX': 'scroll'},
+                style_cell={'textAlign': 'left'}
+            ),
 
             # Confirmation and Error Dialogs
             dcc.ConfirmDialog(id='export-confirm', message='Data exported to DataFrame.'),
             dcc.ConfirmDialog(id='session-error', message='Session value cannot be empty.')
         ]),
-    ])
+    ]),
+
+    # Hidden Div or Store to hold the session data (optional, if needed)
+    # dcc.Store(id='session-data-store', data=[])
 ])
 
 
@@ -287,7 +302,6 @@ app.layout = html.Div(children=[
 def toggle_general_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
-
 # Callback to toggle Tires section visibility
 @app.callback(
     Output('tires-inputs', 'style'),
@@ -296,7 +310,6 @@ def toggle_general_section(n_clicks):
 )
 def toggle_tires_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
-
 
 # Callback to toggle Aero section visibility
 @app.callback(
@@ -307,7 +320,6 @@ def toggle_tires_section(n_clicks):
 def toggle_aero_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
-
 # Callback to toggle Chassis section visibility
 @app.callback(
     Output('chassis-inputs', 'style'),
@@ -316,7 +328,6 @@ def toggle_aero_section(n_clicks):
 )
 def toggle_chassis_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
-
 
 # Callback to toggle Powertrain section visibility
 @app.callback(
@@ -327,6 +338,14 @@ def toggle_chassis_section(n_clicks):
 def toggle_powertrain_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
+# Callback to toggle Suspension section visibility
+@app.callback(
+    Output('suspension-inputs', 'style'),
+    Input('suspension-button', 'n_clicks'),
+    prevent_initial_call=True
+)
+def toggle_suspension_section(n_clicks):
+    return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
 # Callback to toggle Notes section visibility
 @app.callback(
@@ -337,7 +356,6 @@ def toggle_powertrain_section(n_clicks):
 def toggle_notes_section(n_clicks):
     return {'display': 'block'} if n_clicks % 2 == 1 else {'display': 'none'}
 
-
 # Callback to clear all inputs
 @app.callback(
     [
@@ -347,6 +365,7 @@ def toggle_notes_section(n_clicks):
         Output('event', 'value'),
         Output('driver', 'value'),
         Output('weight', 'value'),
+        Output('driver-notes', 'value'),
         Output('fl-pressure-before', 'value'),
         Output('fl-pressure-after', 'value'),
         Output('fl-oTemp-before', 'value'),
@@ -355,7 +374,6 @@ def toggle_notes_section(n_clicks):
         Output('fl-oTemp-after', 'value'),
         Output('fl-mTemp-after', 'value'),
         Output('fl-iTemp-after', 'value'),
-        Output('fl-spring', 'value'),
         Output('fr-pressure-before', 'value'),
         Output('fr-pressure-after', 'value'),
         Output('fr-oTemp-before', 'value'),
@@ -364,7 +382,6 @@ def toggle_notes_section(n_clicks):
         Output('fr-oTemp-after', 'value'),
         Output('fr-mTemp-after', 'value'),
         Output('fr-iTemp-after', 'value'),
-        Output('fr-spring', 'value'),
         Output('rl-pressure-before', 'value'),
         Output('rl-pressure-after', 'value'),
         Output('rl-oTemp-before', 'value'),
@@ -373,7 +390,6 @@ def toggle_notes_section(n_clicks):
         Output('rl-oTemp-after', 'value'),
         Output('rl-mTemp-after', 'value'),
         Output('rl-iTemp-after', 'value'),
-        Output('rl-spring', 'value'),
         Output('rr-pressure-before', 'value'),
         Output('rr-pressure-after', 'value'),
         Output('rr-oTemp-before', 'value'),
@@ -382,9 +398,9 @@ def toggle_notes_section(n_clicks):
         Output('rr-oTemp-after', 'value'),
         Output('rr-mTemp-after', 'value'),
         Output('rr-iTemp-after', 'value'),
-        Output('rr-spring', 'value'),
         Output('tire-compound', 'value'),
-        Output('driver-notes', 'value'),
+        Output('front-spring-rate', 'value'),
+        Output('rear-spring-rate', 'value'),
         Output('faults', 'value'),
         Output('improvements', 'value'),
         Output('misc-notes', 'value')
@@ -398,13 +414,14 @@ def clear_inputs(n_clicks):
             '', '', '', '', '', '', '', '', '',  # FR Tire
             '', '', '', '', '', '', '', '', '',  # RL Tire
             '', '', '', '', '', '', '', '', '',  # RR Tire
-            '', '', '', '', '')  # Notes
+            '', '', '')  # Notes
 
 
-# Callback for exporting data to DataFrame and displaying it in a table
+# Callback for exporting data to DataFrame and displaying it in an editable table
 @app.callback(
     [
-        Output('data-table-container', 'children'),
+        Output('editable-table', 'columns'),
+        Output('editable-table', 'data'),
         Output('export-confirm', 'displayed'),
         Output('session-error', 'displayed')
     ],
@@ -425,7 +442,6 @@ def clear_inputs(n_clicks):
         State('fl-oTemp-after', 'value'),
         State('fl-mTemp-after', 'value'),
         State('fl-iTemp-after', 'value'),
-        State('fl-spring', 'value'),
         State('fr-pressure-before', 'value'),
         State('fr-pressure-after', 'value'),
         State('fr-oTemp-before', 'value'),
@@ -434,7 +450,6 @@ def clear_inputs(n_clicks):
         State('fr-oTemp-after', 'value'),
         State('fr-mTemp-after', 'value'),
         State('fr-iTemp-after', 'value'),
-        State('fr-spring', 'value'),
         State('rl-pressure-before', 'value'),
         State('rl-pressure-after', 'value'),
         State('rl-oTemp-before', 'value'),
@@ -443,7 +458,6 @@ def clear_inputs(n_clicks):
         State('rl-oTemp-after', 'value'),
         State('rl-mTemp-after', 'value'),
         State('rl-iTemp-after', 'value'),
-        State('rl-spring', 'value'),
         State('rr-pressure-before', 'value'),
         State('rr-pressure-after', 'value'),
         State('rr-oTemp-before', 'value'),
@@ -452,32 +466,35 @@ def clear_inputs(n_clicks):
         State('rr-oTemp-after', 'value'),
         State('rr-mTemp-after', 'value'),
         State('rr-iTemp-after', 'value'),
-        State('rr-spring', 'value'),
         State('tire-compound', 'value'),
+        State('front-spring-rate', 'value'),
+        State('rear-spring-rate', 'value'),
         State('faults', 'value'),
         State('improvements', 'value'),
-        State('misc-notes', 'value')
+        State('misc-notes', 'value'),
+        State('editable-table', 'columns'),
+        State('editable-table', 'data')
     ],
     prevent_initial_call=True
 )
 def export_data(n_clicks, session, date, venue, event, driver, weight, driver_notes,
                 fl_pressure_before, fl_pressure_after, fl_oTemp_before, fl_mTemp_before, fl_iTemp_before,
-                fl_oTemp_after, fl_mTemp_after, fl_iTemp_after, fl_spring,
+                fl_oTemp_after, fl_mTemp_after, fl_iTemp_after,
                 fr_pressure_before, fr_pressure_after, fr_oTemp_before, fr_mTemp_before, fr_iTemp_before,
-                fr_oTemp_after, fr_mTemp_after, fr_iTemp_after, fr_spring,
+                fr_oTemp_after, fr_mTemp_after, fr_iTemp_after,
                 rl_pressure_before, rl_pressure_after, rl_oTemp_before, rl_mTemp_before, rl_iTemp_before,
-                rl_oTemp_after, rl_mTemp_after, rl_iTemp_after, rl_spring,
+                rl_oTemp_after, rl_mTemp_after, rl_iTemp_after,
                 rr_pressure_before, rr_pressure_after, rr_oTemp_before, rr_mTemp_before, rr_iTemp_before,
-                rr_oTemp_after, rr_mTemp_after, rr_iTemp_after, rr_spring,
-                tire_compound,
-                faults, improvements, misc_notes):
-    global session_data
+                rr_oTemp_after, rr_mTemp_after, rr_iTemp_after,
+                tire_compound, front_spring_rate, rear_spring_rate,
+                faults, improvements, misc_notes,
+                existing_columns, existing_data):
     if not n_clicks:
         raise PreventUpdate
 
     # Check for a valid session value
     if not session:
-        return no_update, False, True  # Show session error dialog
+        return no_update, no_update, False, True  # Show session error dialog
 
     # Collect data from inputs
     data = {
@@ -497,7 +514,6 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
         'FL O Temp After': fl_oTemp_after,
         'FL M Temp After': fl_mTemp_after,
         'FL I Temp After': fl_iTemp_after,
-        'FL Spring Rate': fl_spring,
         # FR Tire Data
         'FR Pressure Before': fr_pressure_before,
         'FR Pressure After': fr_pressure_after,
@@ -507,7 +523,7 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
         'FR O Temp After': fr_oTemp_after,
         'FR M Temp After': fr_mTemp_after,
         'FR I Temp After': fr_iTemp_after,
-        'FR Spring Rate': fr_spring,
+
         # RL Tire Data
         'RL Pressure Before': rl_pressure_before,
         'RL Pressure After': rl_pressure_after,
@@ -517,7 +533,6 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
         'RL O Temp After': rl_oTemp_after,
         'RL M Temp After': rl_mTemp_after,
         'RL I Temp After': rl_iTemp_after,
-        'RL Spring Rate': rl_spring,
         # RR Tire Data
         'RR Pressure Before': rr_pressure_before,
         'RR Pressure After': rr_pressure_after,
@@ -527,9 +542,11 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
         'RR O Temp After': rr_oTemp_after,
         'RR M Temp After': rr_mTemp_after,
         'RR I Temp After': rr_iTemp_after,
-        'RR Spring Rate': rr_spring,
-        # Tire Compound
+
+        # Suspension
         'Tire Compound': tire_compound,
+        'Front Spring Rate': front_spring_rate,
+        'Rear Spring Rate': rear_spring_rate,
         # Notes
         'Faults': faults,
         'Improvements': improvements,
@@ -537,22 +554,21 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
     }
 
     # Append new data to the DataFrame
-    new_row = pd.DataFrame([data])
-    if session_data.empty:
-        session_data = new_row
+    if existing_data is None or existing_data == []:
+        session_data = pd.DataFrame([data])
     else:
-        session_data = pd.concat([session_data, new_row], ignore_index=True)
+        session_data = pd.DataFrame(existing_data)
+        session_data = session_data.append(data, ignore_index=True)
 
-    # Create editable DataTable
-    table = dash_table.DataTable(
-        columns=[{'name': col, 'id': col, 'editable': True} for col in session_data.columns],
-        data=session_data.to_dict('records'),
-        editable=True,
-        style_table={'overflowX': 'scroll'},
-        style_cell={'textAlign': 'left'}
-    )
+    # Prepare columns if not set
+    if not existing_columns:
+        columns = [{'name': col, 'id': col, 'editable': True} for col in session_data.columns]
+    else:
+        columns = existing_columns
 
-    return table, True, False  # Display table and confirm export
+    data_records = session_data.to_dict('records')
+
+    return columns, data_records, True, False  # Update table and confirm export
 
 
 if __name__ == '__main__':

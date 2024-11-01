@@ -4,8 +4,6 @@ import pandas as pd
 
 app = Dash(__name__)
 
-session_data = pd.DataFrame()
-
 # Define common styles
 button_style = {
     'outline': 'none', 'border': 'none', 'background-color': 'white', 'color': 'black',
@@ -274,14 +272,24 @@ app.layout = html.Div(children=[
         ]),
 
         dcc.Tab(label='Data Table', children=[
-            # Container for Data Table Display
-            html.Div(id='data-table-container'),
+            # DataTable
+            dash_table.DataTable(
+                id='editable-table',
+                columns=[],
+                data=[],
+                editable=True,  # Enable editing
+                style_table={'overflowX': 'scroll'},
+                style_cell={'textAlign': 'left'}
+            ),
 
             # Confirmation and Error Dialogs
             dcc.ConfirmDialog(id='export-confirm', message='Data exported to DataFrame.'),
             dcc.ConfirmDialog(id='session-error', message='Session value cannot be empty.')
         ]),
-    ])
+    ]),
+
+    # Hidden Div or Store to hold the session data (optional, if needed)
+    # dcc.Store(id='session-data-store', data=[])
 ])
 
 
@@ -409,10 +417,11 @@ def clear_inputs(n_clicks):
             '', '', '')  # Notes
 
 
-# Callback for exporting data to DataFrame and displaying it in a table
+# Callback for exporting data to DataFrame and displaying it in an editable table
 @app.callback(
     [
-        Output('data-table-container', 'children'),
+        Output('editable-table', 'columns'),
+        Output('editable-table', 'data'),
         Output('export-confirm', 'displayed'),
         Output('session-error', 'displayed')
     ],
@@ -462,7 +471,9 @@ def clear_inputs(n_clicks):
         State('rear-spring-rate', 'value'),
         State('faults', 'value'),
         State('improvements', 'value'),
-        State('misc-notes', 'value')
+        State('misc-notes', 'value'),
+        State('editable-table', 'columns'),
+        State('editable-table', 'data')
     ],
     prevent_initial_call=True
 )
@@ -476,14 +487,14 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
                 rr_pressure_before, rr_pressure_after, rr_oTemp_before, rr_mTemp_before, rr_iTemp_before,
                 rr_oTemp_after, rr_mTemp_after, rr_iTemp_after,
                 tire_compound, front_spring_rate, rear_spring_rate,
-                faults, improvements, misc_notes):
-    global session_data
+                faults, improvements, misc_notes,
+                existing_columns, existing_data):
     if not n_clicks:
         raise PreventUpdate
 
     # Check for a valid session value
     if not session:
-        return no_update, False, True  # Show session error dialog
+        return no_update, no_update, False, True  # Show session error dialog
 
     # Collect data from inputs
     data = {
@@ -543,22 +554,21 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
     }
 
     # Append new data to the DataFrame
-    new_row = pd.DataFrame([data])
-    if session_data.empty:
-        session_data = new_row
+    if existing_data is None or existing_data == []:
+        session_data = pd.DataFrame([data])
     else:
-        session_data = pd.concat([session_data, new_row], ignore_index=True)
+        session_data = pd.DataFrame(existing_data)
+        session_data = session_data.append(data, ignore_index=True)
 
-    # Create editable DataTable
-    table = dash_table.DataTable(
-        columns=[{'name': col, 'id': col, 'editable': True} for col in session_data.columns],
-        data=session_data.to_dict('records'),
-        editable=True,
-        style_table={'overflowX': 'scroll'},
-        style_cell={'textAlign': 'left'}
-    )
+    # Prepare columns if not set
+    if not existing_columns:
+        columns = [{'name': col, 'id': col, 'editable': True} for col in session_data.columns]
+    else:
+        columns = existing_columns
 
-    return table, True, False  # Display table and confirm export
+    data_records = session_data.to_dict('records')
+
+    return columns, data_records, True, False  # Update table and confirm export
 
 
 if __name__ == '__main__':
