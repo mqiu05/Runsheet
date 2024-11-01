@@ -17,7 +17,7 @@ app.layout = html.Div(children=[
     html.Img(src='/assets/logo.png', alt='Revealed Image'),  # FORMULA PIC
 
     dcc.Tabs(id='tabs', children=[
-        dcc.Tab(label='Input', children=[
+        dcc.Tab(label='Input Data', children=[
             html.Div('Session Number', style=label_style),
             dcc.Input(placeholder='Session Number', type='number', value='', id='session', style=input_style),
 
@@ -28,11 +28,11 @@ app.layout = html.Div(children=[
                     html.Div('Date', style=label_style),
                     dcc.DatePickerSingle(id='date-picker'),
                     html.Div('Venue', style=label_style),
-                    dcc.Dropdown(['Purdue GP', 'Venue 2', 'Venue 3'], placeholder='Venue', id='venue'),
+                    dcc.Dropdown(['Purdue GP', 'Frankfort HS'], placeholder='Venue', id='venue'),
                     html.Div('Event', style=label_style),
-                    dcc.Dropdown(['Skid', 'Brake', 'Autox'], placeholder='Event', id='event'),
+                    dcc.Dropdown(['Acceleration', 'Autocross', 'Brake', 'Endurance', 'Skid Pad'], placeholder='Event', id='event'),
                     html.Div('Driver', style=label_style),
-                    dcc.Dropdown(['Iancarlo', 'Simon', 'Troy', 'Matt'], placeholder='Driver', id='driver'),
+                    dcc.Dropdown(['Iancarlo', 'Matt', 'Simon', 'Troy'], placeholder='Driver', id='driver'),
                     html.Div('Weight', style=label_style),
                     dcc.Input(placeholder='Weight', type='number', value='', id='weight', style=input_style),
                     html.Div('Driver Notes', style=label_style),
@@ -236,12 +236,14 @@ app.layout = html.Div(children=[
                     html.Div('Tire Compound', style=label_style),
                     dcc.Input(placeholder='Tire Compound', value='', style={'width': '10%', 'height': '20px'},
                                  id='tire-compound'),
-                    html.Div('Front Spring Rate', style={'margin-right': '10px'}),
-                    dcc.Input(placeholder='Front Spring Rate', value='', style={'width': '10%', 'height': '20px'},
-                                 id='front-spring-rate'),
-                    html.Div('Rear Spring Rate', style={'margin': '0 10px'}),  # Adjust margin for spacing
-                    dcc.Input(placeholder='Rear Spring Rate', value='', style={'width': '10%', 'height': '20px'},
-                                 id='rear-spring-rate')
+                    html.Div('Front Spring Rate', style=label_style),
+                    dcc.Dropdown(['300', '350', '400', '450'], placeholder='Front Spring Rate', id='front-spring-rate'),
+                    html.Div('Rear Spring Rate', style=label_style),
+                    dcc.Dropdown(['300', '350', '400', '450'], placeholder='Rear Spring Rate', id='rear-spring-rate'),
+                    html.Div('Left ARB', style=label_style),
+                    dcc.Dropdown(['1', '2', '3', '4', '5', '6'], placeholder='Left ARB', id='left-arb'),
+                    html.Div('Right ARB', style=label_style),
+                    dcc.Dropdown(['1', '2', '3', '4', '5', '6'], placeholder='Right ARB', id='right-arb'),
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
 
@@ -271,15 +273,10 @@ app.layout = html.Div(children=[
                         ),
         ]),
 
-        dcc.Tab(label='Data Table', children=[
+        dcc.Tab(label='View Data', children=[
             # DataTable
-            dash_table.DataTable(
-                id='editable-table',
-                columns=[],
-                data=[],
-                editable=True,  # Enable editing
-                style_table={'overflowX': 'scroll'},
-                style_cell={'textAlign': 'left'}
+            dash_table.DataTable(id='editable-table', columns=[], data=[], editable=True,  # Enable editing
+                                style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}
             ),
 
             # Confirmation and Error Dialogs
@@ -401,6 +398,8 @@ def toggle_notes_section(n_clicks):
         Output('tire-compound', 'value'),
         Output('front-spring-rate', 'value'),
         Output('rear-spring-rate', 'value'),
+        Output('left-arb', 'value'),
+        Output('right-arb', 'value'),
         Output('faults', 'value'),
         Output('improvements', 'value'),
         Output('misc-notes', 'value')
@@ -414,7 +413,7 @@ def clear_inputs(n_clicks):
             '', '', '', '', '', '', '', '', '',  # FR Tire
             '', '', '', '', '', '', '', '', '',  # RL Tire
             '', '', '', '', '', '', '', '', '',  # RR Tire
-            '', '', '')  # Notes
+            '', '', '', '', '')  # Notes
 
 
 # Callback for exporting data to DataFrame and displaying it in an editable table
@@ -469,6 +468,8 @@ def clear_inputs(n_clicks):
         State('tire-compound', 'value'),
         State('front-spring-rate', 'value'),
         State('rear-spring-rate', 'value'),
+        State('left-arb', 'value'),
+        State('right-arb', 'value'),
         State('faults', 'value'),
         State('improvements', 'value'),
         State('misc-notes', 'value'),
@@ -486,7 +487,7 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
                 rl_oTemp_after, rl_mTemp_after, rl_iTemp_after,
                 rr_pressure_before, rr_pressure_after, rr_oTemp_before, rr_mTemp_before, rr_iTemp_before,
                 rr_oTemp_after, rr_mTemp_after, rr_iTemp_after,
-                tire_compound, front_spring_rate, rear_spring_rate,
+                tire_compound, front_spring_rate, rear_spring_rate, left_arb, right_arb,
                 faults, improvements, misc_notes,
                 existing_columns, existing_data):
     if not n_clicks:
@@ -523,7 +524,6 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
         'FR O Temp After': fr_oTemp_after,
         'FR M Temp After': fr_mTemp_after,
         'FR I Temp After': fr_iTemp_after,
-
         # RL Tire Data
         'RL Pressure Before': rl_pressure_before,
         'RL Pressure After': rl_pressure_after,
@@ -542,11 +542,12 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
         'RR O Temp After': rr_oTemp_after,
         'RR M Temp After': rr_mTemp_after,
         'RR I Temp After': rr_iTemp_after,
-
         # Suspension
         'Tire Compound': tire_compound,
         'Front Spring Rate': front_spring_rate,
         'Rear Spring Rate': rear_spring_rate,
+        'Left ARB': left_arb,
+        'Right ARB': right_arb,
         # Notes
         'Faults': faults,
         'Improvements': improvements,
