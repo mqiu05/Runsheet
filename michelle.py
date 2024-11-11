@@ -279,12 +279,27 @@ app.layout = html.Div(children=[
             html.H1('General'),
             dash_table.DataTable(id='general-table', columns=[], data=[], editable=True,
                                  style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+
             html.H1('Tire'),
             dash_table.DataTable(id='tire-table', columns=[], data=[], editable=True,
                                  style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+
+            html.H1('Aero'),
+            dash_table.DataTable(id='aero-table', columns=[], data=[], editable=True,
+                                 style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+
+            html.H1('Chassis'),
+            dash_table.DataTable(id='chassis-table', columns=[], data=[], editable=True,
+                                 style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+
+            html.H1('Powertrain'),
+            dash_table.DataTable(id='powertrain-table', columns=[], data=[], editable=True,
+                                 style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+
             html.H1('Suspension'),
             dash_table.DataTable(id='suspension-table', columns=[], data=[], editable=True,
                                  style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+
             html.H1('Notes'),
             dash_table.DataTable(id='notes-table', columns=[], data=[], editable=True,
                                  style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
@@ -439,6 +454,12 @@ def clear_inputs(n_clicks):
         Output('general-table', 'data'),
         Output('tire-table', 'columns'),
         Output('tire-table', 'data'),
+        Output('aero-table', 'columns'),
+        Output('aero-table', 'data'),
+        Output('chassis-table', 'columns'),
+        Output('chassis-table', 'data'),
+        Output('powertrain-table', 'columns'),
+        Output('powertrain-table', 'data'),
         Output('suspension-table', 'columns'),
         Output('suspension-table', 'data'),
         Output('notes-table', 'columns'),
@@ -519,6 +540,9 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
                 faults, improvements, misc_notes,
                 general_columns, general_data,
                 tire_columns, tire_data,
+                aero_columns, aero_data,
+                chassis_columns, chassis_data,
+                powertrain_columns, powertrain_data,
                 suspension_columns, suspension_data,
                 notes_columns, notes_data):
     if not n_clicks:
@@ -594,8 +618,38 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     tire_columns = [{'name': col, 'id': col, 'editable': True} for col in tire_df.columns]
     tire_data_records = tire_df.to_dict('records')
 
+    aero_data_new = {}
+    if aero_data is None or aero_data == []:
+        aero_df = pd.DataFrame([aero_data_new])
+    else:
+        aero_df = pd.DataFrame(aero_data)
+        aero_df = pd.concat([aero_df, pd.DataFrame([aero_data_new])], ignore_index=True)
+
+    aero_columns = [{'name': col, 'id': col, 'editable': True} for col in aero_df.columns]
+    aero_data_records = aero_df.to_dict('records')
+
+    chassis_data_new = {}
+    if chassis_data is None or chassis_data == []:
+        chassis_df = pd.DataFrame([chassis_data_new])
+    else:
+        chassis_df = pd.DataFrame(chassis_data)
+        chassis_df = pd.concat([chassis_df, pd.DataFrame([chassis_data_new])], ignore_index=True)
+
+    chassis_columns = [{'name': col, 'id': col, 'editable': True} for col in chassis_df.columns]
+    chassis_data_records = chassis_df.to_dict('records')
+
+    powertrain_data_new = {}
+    if powertrain_data is None or powertrain_data == []:
+        powertrain_df = pd.DataFrame([powertrain_data_new])
+    else:
+        powertrain_df = pd.DataFrame(powertrain_data)
+        powertrain_df = pd.concat([powertrain_df, pd.DataFrame([powertrain_data_new])], ignore_index=True)
+
+    powertrain_columns = [{'name': col, 'id': col, 'editable': True} for col in powertrain_df.columns]
+    powertrain_data_records = powertrain_df.to_dict('records')
+
+
     suspension_data_new = {
-        # Suspension
         'Tire Compound': tire_compound,
         'Front Spring Rate': front_spring_rate,
         'Rear Spring Rate': rear_spring_rate,
