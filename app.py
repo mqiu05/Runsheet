@@ -520,6 +520,12 @@ def clear_inputs(n_clicks):
         State('general-table', 'data'),
         State('tire-table', 'columns'),
         State('tire-table', 'data'),
+        State('aero-table', 'columns'),
+        State('aero-table', 'data'),
+        State('chassis-table', 'columns'),
+        State('chassis-table', 'data'),
+        State('powertrain-table', 'columns'),
+        State('powertrain-table', 'data'),
         State('suspension-table', 'columns'),
         State('suspension-table', 'data'),
         State('notes-table', 'columns'),
@@ -618,6 +624,7 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     tire_columns = [{'name': col, 'id': col, 'editable': True} for col in tire_df.columns]
     tire_data_records = tire_df.to_dict('records')
 
+    '''
     aero_data_new = {}
     if aero_data is None or aero_data == []:
         aero_df = pd.DataFrame([aero_data_new])
@@ -646,8 +653,8 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
         powertrain_df = pd.concat([powertrain_df, pd.DataFrame([powertrain_data_new])], ignore_index=True)
 
     powertrain_columns = [{'name': col, 'id': col, 'editable': True} for col in powertrain_df.columns]
-    powertrain_data_records = powertrain_df.to_dict('records')
-
+    powertrain_data_records = powertrain_df.to_dict('records')*/
+    '''
 
     suspension_data_new = {
         'Tire Compound': tire_compound,
@@ -682,6 +689,9 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
 
     return (general_columns, general_data_records,
             tire_columns, tire_data_records,
+            aero_columns, aero_data,
+            chassis_columns, chassis_data,
+            powertrain_columns, powertrain_data,
             suspension_columns, suspension_data_records,
             notes_columns, notes_data_records,
             True, False)
