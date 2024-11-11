@@ -1,6 +1,7 @@
 from dash import Dash, html, dcc, Output, Input, State, dash_table, no_update
 from dash.exceptions import PreventUpdate
 import pandas as pd
+import os
 
 app = Dash(__name__)
 
@@ -266,8 +267,8 @@ app.layout = html.Div(children=[
                                'font-size': '20px', 'padding': '10px'}
                         ),
 
-            # Export Button
-            html.Button('Export', id='export-button',
+            # Save Button
+            html.Button('Save', id='save-button',
                         style={'margin-top': '20px', 'margin-left': '20px', 'width': '8%', 'height': '40px',
                                'font-size': '20px', 'padding': '10px'}
                         ),
@@ -287,8 +288,15 @@ app.layout = html.Div(children=[
             html.H1('Notes'),
             dash_table.DataTable(id='notes-table', columns=[], data=[], editable=True,
                                  style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+
+            html.Button('Export', id='export-button',
+                        style={'margin-top': '20px', 'margin-left': '20px', 'width': '8%', 'height': '40px',
+                               'font-size': '20px', 'padding': '10px'}
+                        ),
+            dcc.Download(id='download-button'),
+
             # Confirmation and Error Dialogs
-            dcc.ConfirmDialog(id='export-confirm', message='Data exported to DataFrame.'),
+            dcc.ConfirmDialog(id='save-confirm', message='Data saved to DataFrame.'),
             dcc.ConfirmDialog(id='session-error', message='Session value cannot be empty.')
         ]),
     ]),
@@ -424,7 +432,7 @@ def clear_inputs(n_clicks):
             '', '', '', '', '')  # Notes
 
 
-# Callback for exporting data to DataFrame and displaying it in an editable table
+# Callback for saving data to DataFrame and displaying it in an editable table
 @app.callback(
     [
         Output('general-table', 'columns'),
@@ -435,10 +443,10 @@ def clear_inputs(n_clicks):
         Output('suspension-table', 'data'),
         Output('notes-table', 'columns'),
         Output('notes-table', 'data'),
-        Output('export-confirm', 'displayed'),
-        Output('session-error', 'displayed'),
+        Output('save-confirm', 'displayed'),
+        Output('session-error', 'displayed')
     ],
-    Input('export-button', 'n_clicks'),
+    Input('save-button', 'n_clicks'),
     [
         State('session', 'value'),
         State('date-picker', 'date'),
@@ -498,7 +506,7 @@ def clear_inputs(n_clicks):
     ],
     prevent_initial_call=True
 )
-def export_data(n_clicks, session, date, venue, event, driver, weight, driver_notes,
+def save_data(n_clicks, session, date, venue, event, driver, weight, driver_notes,
                 fl_pressure_before, fl_pressure_after, fl_oTemp_before, fl_mTemp_before, fl_iTemp_before,
                 fl_oTemp_after, fl_mTemp_after, fl_iTemp_after,
                 fr_pressure_before, fr_pressure_after, fr_oTemp_before, fr_mTemp_before, fr_iTemp_before,
@@ -623,6 +631,38 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
             suspension_columns, suspension_data_records,
             notes_columns, notes_data_records,
             True, False)
+
+@app.callback(
+    Output('download-button', 'data'),
+    Input('export-button', 'n_clicks'),
+    [
+        State('general-table', 'data'),
+        State('tire-table', 'data'),
+        State('suspension-table', 'data'),
+        State('notes-table', 'data')
+    ],
+    prevent_initial_call=True
+)
+def export_data(n_clicks, general_data, tire_data, suspension_data, notes_data):
+    if not n_clicks:
+        raise PreventUpdate
+
+    general_df = pd.DataFrame(general_data)
+    tire_df = pd.DataFrame(tire_data)
+    suspension_df = pd.DataFrame(suspension_data)
+    notes_df = pd.DataFrame(notes_data)
+
+    downloads_path = os.path.expanduser("~/Downloads")
+    file_path = os.path.join(downloads_path, "Runsheet.xlsx")
+
+    with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
+        general_df.to_excel(writer, sheet_name='General', index=False)
+        tire_df.to_excel(writer, sheet_name='Tire', index=False)
+        suspension_df.to_excel(writer, sheet_name='Suspension', index=False)
+        notes_df.to_excel(writer, sheet_name='Notes', index=False)
+
+    return dcc.send_file(file_path)
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
