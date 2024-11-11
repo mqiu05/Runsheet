@@ -274,11 +274,19 @@ app.layout = html.Div(children=[
         ]),
 
         dcc.Tab(label='View Data', children=[
-            # DataTable
-            dash_table.DataTable(id='editable-table', columns=[], data=[], editable=True,  # Enable editing
-                                style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}
-            ),
 
+            html.H1('General'),
+            dash_table.DataTable(id='general-table', columns=[], data=[], editable=True,
+                                 style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+            html.H1('Tire'),
+            dash_table.DataTable(id='tire-table', columns=[], data=[], editable=True,
+                                 style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+            html.H1('Suspension'),
+            dash_table.DataTable(id='suspension-table', columns=[], data=[], editable=True,
+                                 style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+            html.H1('Notes'),
+            dash_table.DataTable(id='notes-table', columns=[], data=[], editable=True,
+                                 style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
             # Confirmation and Error Dialogs
             dcc.ConfirmDialog(id='export-confirm', message='Data exported to DataFrame.'),
             dcc.ConfirmDialog(id='session-error', message='Session value cannot be empty.')
@@ -419,10 +427,16 @@ def clear_inputs(n_clicks):
 # Callback for exporting data to DataFrame and displaying it in an editable table
 @app.callback(
     [
-        Output('editable-table', 'columns'),
-        Output('editable-table', 'data'),
+        Output('general-table', 'columns'),
+        Output('general-table', 'data'),
+        Output('tire-table', 'columns'),
+        Output('tire-table', 'data'),
+        Output('suspension-table', 'columns'),
+        Output('suspension-table', 'data'),
+        Output('notes-table', 'columns'),
+        Output('notes-table', 'data'),
         Output('export-confirm', 'displayed'),
-        Output('session-error', 'displayed')
+        Output('session-error', 'displayed'),
     ],
     Input('export-button', 'n_clicks'),
     [
@@ -473,8 +487,14 @@ def clear_inputs(n_clicks):
         State('faults', 'value'),
         State('improvements', 'value'),
         State('misc-notes', 'value'),
-        State('editable-table', 'columns'),
-        State('editable-table', 'data')
+        State('general-table', 'columns'),
+        State('general-table', 'data'),
+        State('tire-table', 'columns'),
+        State('tire-table', 'data'),
+        State('suspension-table', 'columns'),
+        State('suspension-table', 'data'),
+        State('notes-table', 'columns'),
+        State('notes-table', 'data')
     ],
     prevent_initial_call=True
 )
@@ -489,23 +509,37 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
                 rr_oTemp_after, rr_mTemp_after, rr_iTemp_after,
                 tire_compound, front_spring_rate, rear_spring_rate, left_arb, right_arb,
                 faults, improvements, misc_notes,
-                existing_columns, existing_data):
+                general_columns, general_data,
+                tire_columns, tire_data,
+                suspension_columns, suspension_data,
+                notes_columns, notes_data):
     if not n_clicks:
         raise PreventUpdate
 
     # Check for a valid session value
     if not session:
-        return no_update, no_update, False, True  # Show session error dialog
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, True  # Show session error dialog
 
     # Collect data from inputs
-    data = {
+    general_data_new = {
         'Session': session,
         'Date': date,
         'Venue': venue,
         'Event': event,
         'Driver': driver,
         'Weight': weight,
-        'Driver Notes': driver_notes,
+        'Driver Notes': driver_notes
+    }
+    if general_data is None or general_data == []:
+        general_df = pd.DataFrame([general_data_new])
+    else:
+        general_df = pd.DataFrame(general_data)
+        general_df = pd.concat([general_df, pd.DataFrame([general_data_new])], ignore_index=True)
+
+    general_columns = [{'name': col, 'id': col, 'editable': True} for col in general_df.columns]
+    general_data_records = general_df.to_dict('records')
+
+    tire_data_new = {
         # FL Tire Data
         'FL Pressure Before': fl_pressure_before,
         'FL Pressure After': fl_pressure_after,
@@ -541,36 +575,54 @@ def export_data(n_clicks, session, date, venue, event, driver, weight, driver_no
         'RR I Temp Before': rr_iTemp_before,
         'RR O Temp After': rr_oTemp_after,
         'RR M Temp After': rr_mTemp_after,
-        'RR I Temp After': rr_iTemp_after,
+        'RR I Temp After': rr_iTemp_after
+    }
+    if tire_data is None or tire_data == []:
+        tire_df = pd.DataFrame([tire_data_new])
+    else:
+        tire_df = pd.DataFrame(tire_data)
+        tire_df = pd.concat([tire_df, pd.DataFrame([tire_data_new])], ignore_index=True)
+
+    tire_columns = [{'name': col, 'id': col, 'editable': True} for col in tire_df.columns]
+    tire_data_records = tire_df.to_dict('records')
+
+    suspension_data_new = {
         # Suspension
         'Tire Compound': tire_compound,
         'Front Spring Rate': front_spring_rate,
         'Rear Spring Rate': rear_spring_rate,
         'Left ARB': left_arb,
         'Right ARB': right_arb,
+    }
+    if suspension_data is None or suspension_data == []:
+        suspension_df = pd.DataFrame([suspension_data_new])
+    else:
+        suspension_df = pd.DataFrame(suspension_data)
+        suspension_df = pd.concat([suspension_df, pd.DataFrame([suspension_data_new])], ignore_index=True)
+
+    suspension_columns = [{'name': col, 'id': col, 'editable': True} for col in suspension_df.columns]
+    suspension_data_records = suspension_df.to_dict('records')
+
+    notes_data_new = {
         # Notes
         'Faults': faults,
         'Improvements': improvements,
         'Misc Notes': misc_notes
     }
-
-    # Append new data to the DataFrame
-    if existing_data is None or existing_data == []:
-        session_data = pd.DataFrame([data])
+    if notes_data is None or notes_data == []:
+        notes_df = pd.DataFrame([notes_data_new])
     else:
-        session_data = pd.DataFrame(existing_data)
-        session_data = session_data.append(data, ignore_index=True)
+        notes_df = pd.DataFrame(notes_data)
+        notes_df = pd.concat([notes_df, pd.DataFrame([notes_data_new])], ignore_index=True)
 
-    # Prepare columns if not set
-    if not existing_columns:
-        columns = [{'name': col, 'id': col, 'editable': True} for col in session_data.columns]
-    else:
-        columns = existing_columns
+    notes_columns = [{'name': col, 'id': col, 'editable': True} for col in notes_df.columns]
+    notes_data_records = notes_df.to_dict('records')
 
-    data_records = session_data.to_dict('records')
-
-    return columns, data_records, True, False  # Update table and confirm export
-
+    return (general_columns, general_data_records,
+            tire_columns, tire_data_records,
+            suspension_columns, suspension_data_records,
+            notes_columns, notes_data_records,
+            True, False)
 
 if __name__ == '__main__':
     app.run_server(debug=True)
