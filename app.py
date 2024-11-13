@@ -281,7 +281,13 @@ app.layout = html.Div(children=[
                                  style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
 
             html.H1('Tire'),
-            dash_table.DataTable(id='tire-table', columns=[], data=[], editable=True,
+            dash_table.DataTable(id='fl-tire-table', columns=[], data=[], editable=True,
+                                 style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+            dash_table.DataTable(id='fr-tire-table', columns=[], data=[], editable=True,
+                                 style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+            dash_table.DataTable(id='rl-tire-table', columns=[], data=[], editable=True,
+                                 style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
+            dash_table.DataTable(id='rr-tire-table', columns=[], data=[], editable=True,
                                  style_table={'overflowX': 'scroll'}, style_cell={'textAlign': 'left'}),
 
             html.H1('Aero'),
@@ -452,8 +458,14 @@ def clear_inputs(n_clicks):
     [
         Output('general-table', 'columns'),
         Output('general-table', 'data'),
-        Output('tire-table', 'columns'),
-        Output('tire-table', 'data'),
+        Output('fl-tire-table', 'columns'),
+        Output('fl-tire-table', 'data'),
+        Output('fr-tire-table', 'columns'),
+        Output('fr-tire-table', 'data'),
+        Output('rl-tire-table', 'columns'),
+        Output('rl-tire-table', 'data'),
+        Output('rr-tire-table', 'columns'),
+        Output('rr-tire-table', 'data'),
         Output('aero-table', 'columns'),
         Output('aero-table', 'data'),
         Output('chassis-table', 'columns'),
@@ -518,8 +530,14 @@ def clear_inputs(n_clicks):
         State('misc-notes', 'value'),
         State('general-table', 'columns'),
         State('general-table', 'data'),
-        State('tire-table', 'columns'),
-        State('tire-table', 'data'),
+        State('fl-tire-table', 'columns'),
+        State('fl-tire-table', 'data'),
+        State('fr-tire-table', 'columns'),
+        State('fr-tire-table', 'data'),
+        State('rl-tire-table', 'columns'),
+        State('rl-tire-table', 'data'),
+        State('rr-tire-table', 'columns'),
+        State('rr-tire-table', 'data'),
         State('aero-table', 'columns'),
         State('aero-table', 'data'),
         State('chassis-table', 'columns'),
@@ -545,7 +563,10 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
                 tire_compound, front_spring_rate, rear_spring_rate, left_arb, right_arb,
                 faults, improvements, misc_notes,
                 general_columns, general_data,
-                tire_columns, tire_data,
+                fl_tire_columns, fl_tire_data,
+                fr_tire_columns, fr_tire_data,
+                rl_tire_columns, rl_tire_data,
+                rr_tire_columns, rr_tire_data,
                 aero_columns, aero_data,
                 chassis_columns, chassis_data,
                 powertrain_columns, powertrain_data,
@@ -556,7 +577,7 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
 
     # Check for a valid session value
     if not session:
-        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, True  # Show session error dialog
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, True  # Show session error dialog
 
     # Collect data from inputs
     general_data_new = {
@@ -577,7 +598,7 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     general_columns = [{'name': col, 'id': col, 'editable': True} for col in general_df.columns]
     general_data_records = general_df.to_dict('records')
 
-    tire_data_new = {
+    fl_tire_data_new = {
         # FL Tire Data
         'FL Pressure Before': fl_pressure_before,
         'FL Pressure After': fl_pressure_after,
@@ -587,6 +608,17 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
         'FL Outer Temp After': fl_oTemp_after,
         'FL Middle Temp After': fl_mTemp_after,
         'FL Inner Temp After': fl_iTemp_after,
+    }
+    if fl_tire_data is None or fl_tire_data == []:
+        fl_tire_df = pd.DataFrame([fl_tire_data_new])
+    else:
+        fl_tire_df = pd.DataFrame(fl_tire_data)
+        fl_tire_df = pd.concat([fl_tire_df, pd.DataFrame([fl_tire_data_new])], ignore_index=True)
+
+    fl_tire_columns = [{'name': col, 'id': col, 'editable': True} for col in fl_tire_df.columns]
+    fl_tire_data_records = fl_tire_df.to_dict('records')
+
+    fr_tire_data_new = {
         # FR Tire Data
         'FR Pressure Before': fr_pressure_before,
         'FR Pressure After': fr_pressure_after,
@@ -596,6 +628,17 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
         'FR Outer Temp After': fr_oTemp_after,
         'FR Middle Temp After': fr_mTemp_after,
         'FR Inner Temp After': fr_iTemp_after,
+    }
+    if fr_tire_data is None or fr_tire_data == []:
+        fr_tire_df = pd.DataFrame([fr_tire_data_new])
+    else:
+        fr_tire_df = pd.DataFrame(fr_tire_data)
+        fr_tire_df = pd.concat([fr_tire_df, pd.DataFrame([fr_tire_data_new])], ignore_index=True)
+
+    fr_tire_columns = [{'name': col, 'id': col, 'editable': True} for col in fr_tire_df.columns]
+    fr_tire_data_records = fr_tire_df.to_dict('records')
+
+    rl_tire_data_new = {
         # RL Tire Data
         'RL Pressure Before': rl_pressure_before,
         'RL Pressure After': rl_pressure_after,
@@ -605,6 +648,17 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
         'RL Outer Temp After': rl_oTemp_after,
         'RL Middle Temp After': rl_mTemp_after,
         'RL Inner Temp After': rl_iTemp_after,
+    }
+    if rl_tire_data is None or rl_tire_data == []:
+        rl_tire_df = pd.DataFrame([rl_tire_data_new])
+    else:
+        rl_tire_df = pd.DataFrame(rl_tire_data)
+        rl_tire_df = pd.concat([rl_tire_df, pd.DataFrame([rl_tire_data_new])], ignore_index=True)
+
+    rl_tire_columns = [{'name': col, 'id': col, 'editable': True} for col in rl_tire_df.columns]
+    rl_tire_data_records = rl_tire_df.to_dict('records')
+
+    rr_tire_data_new = {
         # RR Tire Data
         'RR Pressure Before': rr_pressure_before,
         'RR Pressure After': rr_pressure_after,
@@ -613,16 +667,16 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
         'RR Inner Temp Before': rr_iTemp_before,
         'RR Outer Temp After': rr_oTemp_after,
         'RR Middle Temp After': rr_mTemp_after,
-        'RR Inner Temp After': rr_iTemp_after
+        'RR Inner Temp After': rr_iTemp_after,
     }
-    if tire_data is None or tire_data == []:
-        tire_df = pd.DataFrame([tire_data_new])
+    if rr_tire_data is None or rr_tire_data == []:
+        rr_tire_df = pd.DataFrame([rr_tire_data_new])
     else:
-        tire_df = pd.DataFrame(tire_data)
-        tire_df = pd.concat([tire_df, pd.DataFrame([tire_data_new])], ignore_index=True)
+        rr_tire_df = pd.DataFrame(rr_tire_data)
+        rr_tire_df = pd.concat([rr_tire_df, pd.DataFrame([rr_tire_data_new])], ignore_index=True)
 
-    tire_columns = [{'name': col, 'id': col, 'editable': True} for col in tire_df.columns]
-    tire_data_records = tire_df.to_dict('records')
+    rr_tire_columns = [{'name': col, 'id': col, 'editable': True} for col in rr_tire_df.columns]
+    rr_tire_data_records = rr_tire_df.to_dict('records')
 
     '''
     aero_data_new = {}
@@ -688,7 +742,10 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     notes_data_records = notes_df.to_dict('records')
 
     return (general_columns, general_data_records,
-            tire_columns, tire_data_records,
+            fl_tire_columns, fl_tire_data_records,
+            fr_tire_columns, fr_tire_data_records,
+            rl_tire_columns, rl_tire_data_records,
+            rr_tire_columns, rr_tire_data_records,
             aero_columns, aero_data,
             chassis_columns, chassis_data,
             powertrain_columns, powertrain_data,
@@ -701,18 +758,24 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     Input('export-button', 'n_clicks'),
     [
         State('general-table', 'data'),
-        State('tire-table', 'data'),
+        State('fl-tire-table', 'data'),
+        State('fr-tire-table', 'data'),
+        State('rl-tire-table', 'data'),
+        State('rr-tire-table', 'data'),
         State('suspension-table', 'data'),
         State('notes-table', 'data')
     ],
     prevent_initial_call=True
 )
-def export_data(n_clicks, general_data, tire_data, suspension_data, notes_data):
+def export_data(n_clicks, general_data, fl_tire_data, fr_tire_data, rl_tire_data, rr_tire_data, suspension_data, notes_data):
     if not n_clicks:
         raise PreventUpdate
 
     general_df = pd.DataFrame(general_data)
-    tire_df = pd.DataFrame(tire_data)
+    fl_tire_df = pd.DataFrame(fl_tire_data)
+    fr_tire_df = pd.DataFrame(fr_tire_data)
+    rl_tire_df = pd.DataFrame(rl_tire_data)
+    rr_tire_df = pd.DataFrame(rr_tire_data)
     suspension_df = pd.DataFrame(suspension_data)
     notes_df = pd.DataFrame(notes_data)
 
@@ -721,7 +784,10 @@ def export_data(n_clicks, general_data, tire_data, suspension_data, notes_data):
 
     with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
         general_df.to_excel(writer, sheet_name='General', index=False)
-        tire_df.to_excel(writer, sheet_name='Tire', index=False)
+        fl_tire_df.to_excel(writer, sheet_name='FL Tire', index=False)
+        fr_tire_df.to_excel(writer, sheet_name='FR Tire', index=False)
+        rl_tire_df.to_excel(writer, sheet_name='RL Tire', index=False)
+        rr_tire_df.to_excel(writer, sheet_name='RR Tire', index=False)
         suspension_df.to_excel(writer, sheet_name='Suspension', index=False)
         notes_df.to_excel(writer, sheet_name='Notes', index=False)
 
