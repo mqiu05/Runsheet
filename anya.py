@@ -237,30 +237,17 @@ app.layout = html.Div(children=[
                     html.Div('Tire Compound', style=label_style),
                     dcc.Input(placeholder='Tire Compound', value='', style={'width': '10%', 'height': '20px'},
                                  id='tire-compound'),
+                    html.Div('Tire Set', style=label_style),
+                    dcc.Input(placeholder='Tire Set', value='', style={'width': '10%', 'height': '20px'},
+                                 id='tire-set'),
                     html.Div('Front Spring Rate', style=label_style),
                     dcc.Dropdown(['300', '350', '400', '450'], placeholder='Front Spring Rate', id='front-spring-rate'),
                     html.Div('Rear Spring Rate', style=label_style),
                     dcc.Dropdown(['300', '350', '400', '450'], placeholder='Rear Spring Rate', id='rear-spring-rate'),
-                    html.Div('Front ARB', style=label_style),
-                    dcc.Dropdown(['1', '2', '3', '4', '5', '6'], placeholder='Front ARB', id='front-arb'),
-                    html.Div('Rear ARB', style=label_style),
-                    dcc.Dropdown(['1', '2', '3', '4', '5', '6'], placeholder='Rear ARB', id='rear-arb'),
-                    html.Div('Toe Angle', style=label_style),
-                    dcc.Input(placeholder='Toe Angle', id='toe-angle'),
-                    html.Div('Camber Angle', style=label_style),
-                    dcc.Input(placeholder='Camber Angle', id='camber-angle'),
-                    html.Div('Front Damper', style=label_style),
-                    dcc.Dropdown(['1', '2', '3', '4', '5', '6','7','8','9'], placeholder='Front Damper', id='front-damper'),
-                    html.Div('Rear Damper', style=label_style),
-                    dcc.Dropdown(['1', '2', '3', '4', '5', '6','7','8','9'], placeholder='Rear Damper', id='rear-damper'),
-                    html.Div('Tire Type', style=label_style),
-                    dcc.Dropdown(['Dry', 'Wet'], placeholder='Tire Type', id='tire-type'),
-                    html.Div('Tire Wear', style=label_style),
-                    dcc.Dropdown(['Old', 'New'], placeholder='Tire Wear', id='tire-wear'),
-                    html.Div('Front Ride Height', style=label_style),
-                    dcc.Input(placeholder='Front Ride Height', id='front-ride-height'),
-                    html.Div('Rear Ride Height', style=label_style),
-                    dcc.Input(placeholder='Rear Ride Height', id='rear-ride-height'),
+                    html.Div('Left ARB', style=label_style),
+                    dcc.Dropdown(['1', '2', '3', '4', '5', '6'], placeholder='Left ARB', id='left-arb'),
+                    html.Div('Right ARB', style=label_style),
+                    dcc.Dropdown(['1', '2', '3', '4', '5', '6'], placeholder='Right ARB', id='right-arb'),
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
 
@@ -449,18 +436,11 @@ def toggle_notes_section(n_clicks):
         Output('rr-mTemp-after', 'value'),
         Output('rr-iTemp-after', 'value'),
         Output('tire-compound', 'value'),
+        Output('tire-set', 'value'),
         Output('front-spring-rate', 'value'),
         Output('rear-spring-rate', 'value'),
-        Output('front-arb', 'value'),
-        Output('rear-arb', 'value'),
-        Output('toe-angle','value'),
-        Output('camber-angle', 'value'),
-        Output('front-damper', 'value'),
-        Output('rear-damper', 'value'),
-        Output('tire-type', 'value'),
-        Output('tire-wear','value'),
-        Output('front-ride-height','value'),
-        Output('rear-ride-height','value'),
+        Output('left-arb', 'value'),
+        Output('right-arb', 'value'),
         Output('faults', 'value'),
         Output('improvements', 'value'),
         Output('misc-notes', 'value')
@@ -474,7 +454,7 @@ def clear_inputs(n_clicks):
             '', '', '', '', '', '', '', '', '',  # FR Tire
             '', '', '', '', '', '', '', '', '',  # RL Tire
             '', '', '', '', '', '', '', '', '',  # RR Tire
-            '', '', '', '', '', '', '', '', '', '', '', '', '',)  # Notes
+            '', '', '', '', '', '')  # Notes
 
 
 # Callback for saving data to DataFrame and displaying it in an editable table
@@ -545,18 +525,11 @@ def clear_inputs(n_clicks):
         State('rr-mTemp-after', 'value'),
         State('rr-iTemp-after', 'value'),
         State('tire-compound', 'value'),
+        State('tire-set', 'value'),
         State('front-spring-rate', 'value'),
         State('rear-spring-rate', 'value'),
-        State('front-arb', 'value'),
-        State('rear-arb', 'value'),
-        State('toe-angle','value'),
-        State('camber-angle','value'),
-        State('front-damper','value'),
-        State('rear-damper','value'),
-        State('tire-type','value'),
-        State('tire-wear','value'),
-        State('front-ride-height','value'),
-        State('rear-ride-height','value'),
+        State('left-arb', 'value'),
+        State('right-arb', 'value'),
         State('faults', 'value'),
         State('improvements', 'value'),
         State('misc-notes', 'value'),
@@ -592,8 +565,7 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
                 rl_oTemp_after, rl_mTemp_after, rl_iTemp_after,
                 rr_pressure_before, rr_pressure_after, rr_oTemp_before, rr_mTemp_before, rr_iTemp_before,
                 rr_oTemp_after, rr_mTemp_after, rr_iTemp_after,
-                tire_compound, front_spring_rate, rear_spring_rate, front_arb, rear_arb, toe_angle, camber_angle,
-                front_damper, rear_damper, tire_type, tire_wear, front_ride_height, rear_ride_height,
+                tire_compound, tire_set, front_spring_rate, rear_spring_rate, left_arb, right_arb,
                 faults, improvements, misc_notes,
                 general_columns, general_data,
                 fl_tire_columns, fl_tire_data,
@@ -610,7 +582,7 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
 
     # Check for a valid session value
     if not session:
-        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, True  # Show session error dialog
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, True  # Show session error dialog
 
     # Collect data from inputs
     general_data_new = {
@@ -745,18 +717,11 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
 
     suspension_data_new = {
         'Tire Compound': tire_compound,
+        'Tire Set': tire_set,
         'Front Spring Rate': front_spring_rate,
         'Rear Spring Rate': rear_spring_rate,
-        'Front ARB': front_arb,
-        'Rear ARB': rear_arb,
-        'Toe Angle': toe_angle,
-        'Camber Angle': camber_angle,
-        'Front Damper': front_damper,
-        'Rear Damper': rear_damper,
-        'Tire Type': tire_type,
-        'Tire Wear': tire_wear,
-        'Front Ride Height': front_ride_height,
-        'Rear Ride Height': rear_ride_height
+        'Left ARB': left_arb,
+        'Right ARB': right_arb,
     }
     if suspension_data is None or suspension_data == []:
         suspension_df = pd.DataFrame([suspension_data_new])

@@ -237,6 +237,9 @@ app.layout = html.Div(children=[
                     html.Div('Tire Compound', style=label_style),
                     dcc.Input(placeholder='Tire Compound', value='', style={'width': '10%', 'height': '20px'},
                                  id='tire-compound'),
+                    html.Div('Tire Set', style=label_style),
+                    dcc.Input(placeholder='Tire Set', value='', style={'width': '10%', 'height': '20px'},
+                                 id='tire-set'),
                     html.Div('Front Spring Rate', style=label_style),
                     dcc.Dropdown(['300', '350', '400', '450'], placeholder='Front Spring Rate', id='front-spring-rate'),
                     html.Div('Rear Spring Rate', style=label_style),
@@ -433,6 +436,7 @@ def toggle_notes_section(n_clicks):
         Output('rr-mTemp-after', 'value'),
         Output('rr-iTemp-after', 'value'),
         Output('tire-compound', 'value'),
+        Output('tire-set', 'value'),
         Output('front-spring-rate', 'value'),
         Output('rear-spring-rate', 'value'),
         Output('left-arb', 'value'),
@@ -450,7 +454,7 @@ def clear_inputs(n_clicks):
             '', '', '', '', '', '', '', '', '',  # FR Tire
             '', '', '', '', '', '', '', '', '',  # RL Tire
             '', '', '', '', '', '', '', '', '',  # RR Tire
-            '', '', '', '', '')  # Notes
+            '', '', '', '', '', '')  # Notes
 
 
 # Callback for saving data to DataFrame and displaying it in an editable table
@@ -521,6 +525,7 @@ def clear_inputs(n_clicks):
         State('rr-mTemp-after', 'value'),
         State('rr-iTemp-after', 'value'),
         State('tire-compound', 'value'),
+        State('tire-set', 'value'),
         State('front-spring-rate', 'value'),
         State('rear-spring-rate', 'value'),
         State('left-arb', 'value'),
@@ -560,7 +565,7 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
                 rl_oTemp_after, rl_mTemp_after, rl_iTemp_after,
                 rr_pressure_before, rr_pressure_after, rr_oTemp_before, rr_mTemp_before, rr_iTemp_before,
                 rr_oTemp_after, rr_mTemp_after, rr_iTemp_after,
-                tire_compound, front_spring_rate, rear_spring_rate, left_arb, right_arb,
+                tire_compound, tire_set, front_spring_rate, rear_spring_rate, left_arb, right_arb,
                 faults, improvements, misc_notes,
                 general_columns, general_data,
                 fl_tire_columns, fl_tire_data,
@@ -577,7 +582,7 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
 
     # Check for a valid session value
     if not session:
-        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, True  # Show session error dialog
+        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, True  # Show session error dialog
 
     # Collect data from inputs
     general_data_new = {
@@ -712,6 +717,7 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
 
     suspension_data_new = {
         'Tire Compound': tire_compound,
+        'Tire Set': tire_set,
         'Front Spring Rate': front_spring_rate,
         'Rear Spring Rate': rear_spring_rate,
         'Left ARB': left_arb,
