@@ -213,6 +213,7 @@ app.layout = html.Div(children=[
             html.Div(children=[
                 html.Button('Aero', id='aero-button', n_clicks=0, style=button_style),
                 html.Div(id='aero-inputs', children=[
+                    # Add Aero inputs if needed here.
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
 
@@ -220,6 +221,7 @@ app.layout = html.Div(children=[
             html.Div(children=[
                 html.Button('Chassis', id='chassis-button', n_clicks=0, style=button_style),
                 html.Div(id='chassis-inputs', children=[
+                    # Add Chassis inputs if needed here.
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
 
@@ -227,6 +229,7 @@ app.layout = html.Div(children=[
             html.Div(children=[
                 html.Button('Powertrain', id='powertrain-button', n_clicks=0, style=button_style),
                 html.Div(id='powertrain-inputs', children=[
+                    # Add Powertrain inputs if needed here.
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
 
@@ -236,10 +239,10 @@ app.layout = html.Div(children=[
                 html.Div(id='suspension-inputs', children=[
                     html.Div('Tire Compound', style=label_style),
                     dcc.Input(placeholder='Tire Compound', value='', style={'width': '10%', 'height': '20px'},
-                                 id='tire-compound'),
+                              id='tire-compound'),
                     html.Div('Tire Set', style=label_style),
                     dcc.Input(placeholder='Tire Set', value='', style={'width': '10%', 'height': '20px'},
-                                 id='tire-set'),
+                              id='tire-set'),
                     html.Div('Front Spring Rate', style=label_style),
                     dcc.Dropdown(['300', '350', '400', '450'], placeholder='Front Spring Rate', id='front-spring-rate'),
                     html.Div('Rear Spring Rate', style=label_style),
@@ -456,7 +459,6 @@ def clear_inputs(n_clicks):
             '', '', '', '', '', '', '', '', '',  # RR Tire
             '', '', '', '', '', '')  # Notes
 
-
 # Callback for saving data to DataFrame and displaying it in an editable table
 @app.callback(
     [
@@ -557,34 +559,37 @@ def clear_inputs(n_clicks):
     prevent_initial_call=True
 )
 def save_data(n_clicks, session, date, venue, event, driver, weight, driver_notes,
-                fl_pressure_before, fl_pressure_after, fl_oTemp_before, fl_mTemp_before, fl_iTemp_before,
-                fl_oTemp_after, fl_mTemp_after, fl_iTemp_after,
-                fr_pressure_before, fr_pressure_after, fr_oTemp_before, fr_mTemp_before, fr_iTemp_before,
-                fr_oTemp_after, fr_mTemp_after, fr_iTemp_after,
-                rl_pressure_before, rl_pressure_after, rl_oTemp_before, rl_mTemp_before, rl_iTemp_before,
-                rl_oTemp_after, rl_mTemp_after, rl_iTemp_after,
-                rr_pressure_before, rr_pressure_after, rr_oTemp_before, rr_mTemp_before, rr_iTemp_before,
-                rr_oTemp_after, rr_mTemp_after, rr_iTemp_after,
-                tire_compound, tire_set, front_spring_rate, rear_spring_rate, left_arb, right_arb,
-                faults, improvements, misc_notes,
-                general_columns, general_data,
-                fl_tire_columns, fl_tire_data,
-                fr_tire_columns, fr_tire_data,
-                rl_tire_columns, rl_tire_data,
-                rr_tire_columns, rr_tire_data,
-                aero_columns, aero_data,
-                chassis_columns, chassis_data,
-                powertrain_columns, powertrain_data,
-                suspension_columns, suspension_data,
-                notes_columns, notes_data):
+              fl_pressure_before, fl_pressure_after, fl_oTemp_before, fl_mTemp_before, fl_iTemp_before,
+              fl_oTemp_after, fl_mTemp_after, fl_iTemp_after,
+              fr_pressure_before, fr_pressure_after, fr_oTemp_before, fr_mTemp_before, fr_iTemp_before,
+              fr_oTemp_after, fr_mTemp_after, fr_iTemp_after,
+              rl_pressure_before, rl_pressure_after, rl_oTemp_before, rl_mTemp_before, rl_iTemp_before,
+              rl_oTemp_after, rl_mTemp_after, rl_iTemp_after,
+              rr_pressure_before, rr_pressure_after, rr_oTemp_before, rr_mTemp_before, rr_iTemp_before,
+              rr_oTemp_after, rr_mTemp_after, rr_iTemp_after,
+              tire_compound, tire_set, front_spring_rate, rear_spring_rate, left_arb, right_arb,
+              faults, improvements, misc_notes,
+              general_columns, general_data,
+              fl_tire_columns, fl_tire_data,
+              fr_tire_columns, fr_tire_data,
+              rl_tire_columns, rl_tire_data,
+              rr_tire_columns, rr_tire_data,
+              aero_columns, aero_data,
+              chassis_columns, chassis_data,
+              powertrain_columns, powertrain_data,
+              suspension_columns, suspension_data,
+              notes_columns, notes_data):
     if not n_clicks:
         raise PreventUpdate
 
     # Check for a valid session value
     if not session:
-        return no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, False, True  # Show session error dialog
+        # Show session error dialog
+        return (no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+                no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update, no_update,
+                False, True)
 
-    # Collect data from inputs
+    # General Data
     general_data_new = {
         'Session': session,
         'Date': date,
@@ -599,12 +604,11 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     else:
         general_df = pd.DataFrame(general_data)
         general_df = pd.concat([general_df, pd.DataFrame([general_data_new])], ignore_index=True)
-
     general_columns = [{'name': col, 'id': col, 'editable': True} for col in general_df.columns]
     general_data_records = general_df.to_dict('records')
 
+    # FL Tire Data
     fl_tire_data_new = {
-        # FL Tire Data
         'FL Pressure Before': fl_pressure_before,
         'FL Pressure After': fl_pressure_after,
         'FL Outer Temp Before': fl_oTemp_before,
@@ -619,12 +623,11 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     else:
         fl_tire_df = pd.DataFrame(fl_tire_data)
         fl_tire_df = pd.concat([fl_tire_df, pd.DataFrame([fl_tire_data_new])], ignore_index=True)
-
     fl_tire_columns = [{'name': col, 'id': col, 'editable': True} for col in fl_tire_df.columns]
     fl_tire_data_records = fl_tire_df.to_dict('records')
 
+    # FR Tire Data
     fr_tire_data_new = {
-        # FR Tire Data
         'FR Pressure Before': fr_pressure_before,
         'FR Pressure After': fr_pressure_after,
         'FR Outer Temp Before': fr_oTemp_before,
@@ -639,12 +642,11 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     else:
         fr_tire_df = pd.DataFrame(fr_tire_data)
         fr_tire_df = pd.concat([fr_tire_df, pd.DataFrame([fr_tire_data_new])], ignore_index=True)
-
     fr_tire_columns = [{'name': col, 'id': col, 'editable': True} for col in fr_tire_df.columns]
     fr_tire_data_records = fr_tire_df.to_dict('records')
 
+    # RL Tire Data
     rl_tire_data_new = {
-        # RL Tire Data
         'RL Pressure Before': rl_pressure_before,
         'RL Pressure After': rl_pressure_after,
         'RL Outer Temp Before': rl_oTemp_before,
@@ -659,12 +661,11 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     else:
         rl_tire_df = pd.DataFrame(rl_tire_data)
         rl_tire_df = pd.concat([rl_tire_df, pd.DataFrame([rl_tire_data_new])], ignore_index=True)
-
     rl_tire_columns = [{'name': col, 'id': col, 'editable': True} for col in rl_tire_df.columns]
     rl_tire_data_records = rl_tire_df.to_dict('records')
 
+    # RR Tire Data
     rr_tire_data_new = {
-        # RR Tire Data
         'RR Pressure Before': rr_pressure_before,
         'RR Pressure After': rr_pressure_after,
         'RR Outer Temp Before': rr_oTemp_before,
@@ -679,42 +680,40 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     else:
         rr_tire_df = pd.DataFrame(rr_tire_data)
         rr_tire_df = pd.concat([rr_tire_df, pd.DataFrame([rr_tire_data_new])], ignore_index=True)
-
     rr_tire_columns = [{'name': col, 'id': col, 'editable': True} for col in rr_tire_df.columns]
     rr_tire_data_records = rr_tire_df.to_dict('records')
 
-    '''
+    # Aero Data
     aero_data_new = {}
     if aero_data is None or aero_data == []:
         aero_df = pd.DataFrame([aero_data_new])
     else:
         aero_df = pd.DataFrame(aero_data)
         aero_df = pd.concat([aero_df, pd.DataFrame([aero_data_new])], ignore_index=True)
-
     aero_columns = [{'name': col, 'id': col, 'editable': True} for col in aero_df.columns]
     aero_data_records = aero_df.to_dict('records')
 
+    # Chassis Data
     chassis_data_new = {}
     if chassis_data is None or chassis_data == []:
         chassis_df = pd.DataFrame([chassis_data_new])
     else:
         chassis_df = pd.DataFrame(chassis_data)
         chassis_df = pd.concat([chassis_df, pd.DataFrame([chassis_data_new])], ignore_index=True)
-
     chassis_columns = [{'name': col, 'id': col, 'editable': True} for col in chassis_df.columns]
     chassis_data_records = chassis_df.to_dict('records')
 
+    # Powertrain Data
     powertrain_data_new = {}
     if powertrain_data is None or powertrain_data == []:
         powertrain_df = pd.DataFrame([powertrain_data_new])
     else:
         powertrain_df = pd.DataFrame(powertrain_data)
         powertrain_df = pd.concat([powertrain_df, pd.DataFrame([powertrain_data_new])], ignore_index=True)
-
     powertrain_columns = [{'name': col, 'id': col, 'editable': True} for col in powertrain_df.columns]
-    powertrain_data_records = powertrain_df.to_dict('records')*/
-    '''
+    powertrain_data_records = powertrain_df.to_dict('records')
 
+    # Suspension Data
     suspension_data_new = {
         'Tire Compound': tire_compound,
         'Tire Set': tire_set,
@@ -728,12 +727,11 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     else:
         suspension_df = pd.DataFrame(suspension_data)
         suspension_df = pd.concat([suspension_df, pd.DataFrame([suspension_data_new])], ignore_index=True)
-
     suspension_columns = [{'name': col, 'id': col, 'editable': True} for col in suspension_df.columns]
     suspension_data_records = suspension_df.to_dict('records')
 
+    # Notes Data
     notes_data_new = {
-        # Notes
         'Faults': faults,
         'Improvements': improvements,
         'Misc Notes': misc_notes
@@ -743,7 +741,6 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     else:
         notes_df = pd.DataFrame(notes_data)
         notes_df = pd.concat([notes_df, pd.DataFrame([notes_data_new])], ignore_index=True)
-
     notes_columns = [{'name': col, 'id': col, 'editable': True} for col in notes_df.columns]
     notes_data_records = notes_df.to_dict('records')
 
@@ -752,9 +749,9 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
             fr_tire_columns, fr_tire_data_records,
             rl_tire_columns, rl_tire_data_records,
             rr_tire_columns, rr_tire_data_records,
-            aero_columns, aero_data,
-            chassis_columns, chassis_data,
-            powertrain_columns, powertrain_data,
+            aero_columns, aero_data_records,
+            chassis_columns, chassis_data_records,
+            powertrain_columns, powertrain_data_records,
             suspension_columns, suspension_data_records,
             notes_columns, notes_data_records,
             True, False)
