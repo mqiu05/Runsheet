@@ -214,11 +214,12 @@ app.layout = html.Div(children=[
             html.Div(children=[
                 html.Button('Aero', id='aero-button', n_clicks=0, style=button_style),
                 html.Div(id='aero-inputs', children=[
-                    dcc.Checklist(
-                        ['Front Wing', 'Undertray', 'Rear Wing'],
-                        [],
-                        style={'font-size': '18px', 'padding': '10px', 'gap': '15px'}
-                    )
+                    html.Div('Front Wing', style=label_style),
+                    dcc.Dropdown(['Yes', 'No'], placeholder='Front Wing', id='front-wing'),
+                    html.Div('Undertray', style=label_style),
+                    dcc.Dropdown(['Yes', 'No'], placeholder='Undertray', id='undertray'),
+                    html.Div('Rear Wing', style=label_style),
+                    dcc.Dropdown(['Yes', 'No'], placeholder='Rear Wing', id='rear-wing'),
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
 
@@ -451,7 +452,10 @@ def toggle_notes_section(n_clicks):
         Output('right-arb', 'value'),
         Output('faults', 'value'),
         Output('improvements', 'value'),
-        Output('misc-notes', 'value')
+        Output('misc-notes', 'value'),
+        Output('front-wing','value'),
+        Output('rear-wing','value'),
+        Output('undertray','value')
     ],
     Input('clear-button', 'n_clicks'),
     prevent_initial_call=True
@@ -462,7 +466,8 @@ def clear_inputs(n_clicks):
             '', '', '', '', '', '', '', '', '',  # FR Tire
             '', '', '', '', '', '', '', '', '',  # RL Tire
             '', '', '', '', '', '', '', '', '',  # RR Tire
-            '', '', '', '', '', '')  # Notes
+            '', '', '', '', '', '',  # Notes
+            '','','')  # Aero
 
 # Callback for saving data to DataFrame and displaying it in an editable table
 @app.callback(
@@ -559,7 +564,13 @@ def clear_inputs(n_clicks):
         State('suspension-table', 'columns'),
         State('suspension-table', 'data'),
         State('notes-table', 'columns'),
-        State('notes-table', 'data')
+        State('notes-table', 'data'),
+        State('front-wing','columns'),
+        State('front-wing','data'),
+        State('rear-wing', 'columns'),
+        State('rear-wing', 'data'),
+        State('undertray', 'columns'),
+        State('undertray', 'data')
     ],
     prevent_initial_call=True
 )
@@ -583,7 +594,7 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
               chassis_columns, chassis_data,
               powertrain_columns, powertrain_data,
               suspension_columns, suspension_data,
-              notes_columns, notes_data):
+              notes_columns, notes_data, rear_wing, front_wing, undertray):
     if not n_clicks:
         raise PreventUpdate
 
