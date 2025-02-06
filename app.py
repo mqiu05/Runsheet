@@ -1,5 +1,6 @@
 from dash import Dash, html, dcc, Output, Input, State, dash_table, no_update
 from dash.exceptions import PreventUpdate
+import dash_bootstrap_components as dbc
 import pandas as pd
 import os
 
@@ -775,22 +776,22 @@ def export_data(n_clicks, general_data, fl_tire_data, fr_tire_data, rl_tire_data
         raise PreventUpdate
 
     general_df = pd.DataFrame(general_data)
+    suspension_df = pd.DataFrame(suspension_data)
+    notes_df = pd.DataFrame(notes_data)
+
     fl_tire_df = pd.DataFrame(fl_tire_data)
     fr_tire_df = pd.DataFrame(fr_tire_data)
     rl_tire_df = pd.DataFrame(rl_tire_data)
     rr_tire_df = pd.DataFrame(rr_tire_data)
-    suspension_df = pd.DataFrame(suspension_data)
-    notes_df = pd.DataFrame(notes_data)
+
+    tire_df = pd.concat([fl_tire_df, fr_tire_df], ignore_index=True)
 
     downloads_path = os.path.expanduser("~/Downloads")
     file_path = os.path.join(downloads_path, "Runsheet.xlsx")
 
     with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
         general_df.to_excel(writer, sheet_name='General', index=False)
-        fl_tire_df.to_excel(writer, sheet_name='FL Tire', index=False)
-        fr_tire_df.to_excel(writer, sheet_name='FR Tire', index=False)
-        rl_tire_df.to_excel(writer, sheet_name='RL Tire', index=False)
-        rr_tire_df.to_excel(writer, sheet_name='RR Tire', index=False)
+        tire_df.to_excel(writer, sheet_name='Tires', index=False)
         suspension_df.to_excel(writer, sheet_name='Suspension', index=False)
         notes_df.to_excel(writer, sheet_name='Notes', index=False)
 
