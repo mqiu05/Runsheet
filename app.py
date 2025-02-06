@@ -214,7 +214,11 @@ app.layout = html.Div(children=[
             html.Div(children=[
                 html.Button('Aero', id='aero-button', n_clicks=0, style=button_style),
                 html.Div(id='aero-inputs', children=[
-                    # Add Aero inputs if needed here.
+                    dcc.Checklist(
+                        ['Front Wing', 'Undertray', 'Rear Wing'],
+                        [],
+                        style={'font-size': '18px', 'padding': '10px', 'gap': '15px'}
+                    )
                 ], style={'display': 'none'}),
             ], style={'margin-bottom': '20px'}),
 
