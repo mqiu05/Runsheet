@@ -216,8 +216,8 @@ app.layout = html.Div(children=[
                 html.Div(id='aero-inputs', children=[
                     html.Div('Front Wing', style=label_style),
                     dcc.Dropdown(['Yes', 'No'], placeholder='Front Wing', id='front-wing'),
-                    html.Div('Undertray', style=label_style),
-                    dcc.Dropdown(['Yes', 'No'], placeholder='Undertray', id='undertray'),
+                    html.Div('Under tray', style=label_style),
+                    dcc.Dropdown(['Yes', 'No'], placeholder='Under tray', id='under-tray'),
                     html.Div('Rear Wing', style=label_style),
                     dcc.Dropdown(['Yes', 'No'], placeholder='Rear Wing', id='rear-wing'),
                 ], style={'display': 'none'}),
@@ -333,11 +333,7 @@ app.layout = html.Div(children=[
             dcc.ConfirmDialog(id='session-error', message='Session value cannot be empty.')
         ]),
     ]),
-
-    # Hidden Div or Store to hold the session data (optional, if needed)
-    # dcc.Store(id='session-data-store', data=[])
 ])
-
 
 # Callback to toggle General section visibility
 @app.callback(
@@ -455,7 +451,7 @@ def toggle_notes_section(n_clicks):
         Output('misc-notes', 'value'),
         Output('front-wing','value'),
         Output('rear-wing','value'),
-        Output('undertray','value')
+        Output('under-tray','value')
     ],
     Input('clear-button', 'n_clicks'),
     prevent_initial_call=True
@@ -467,7 +463,8 @@ def clear_inputs(n_clicks):
             '', '', '', '', '', '', '', '', '',  # RL Tire
             '', '', '', '', '', '', '', '', '',  # RR Tire
             '', '', '', '', '', '',  # Notes
-            '','','')  # Aero
+            '', '', ''  # Aero
+            )
 
 # Callback for saving data to DataFrame and displaying it in an editable table
 @app.callback(
@@ -565,12 +562,9 @@ def clear_inputs(n_clicks):
         State('suspension-table', 'data'),
         State('notes-table', 'columns'),
         State('notes-table', 'data'),
-        State('front-wing','columns'),
-        State('front-wing','data'),
-        State('rear-wing', 'columns'),
-        State('rear-wing', 'data'),
-        State('undertray', 'columns'),
-        State('undertray', 'data')
+        State('front-wing','value'),
+        State('rear-wing', 'value'),
+        State('under-tray', 'value')
     ],
     prevent_initial_call=True
 )
@@ -594,7 +588,8 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
               chassis_columns, chassis_data,
               powertrain_columns, powertrain_data,
               suspension_columns, suspension_data,
-              notes_columns, notes_data, rear_wing, front_wing, undertray):
+              notes_columns, notes_data,
+              rear_wing, front_wing, under_tray):
     if not n_clicks:
         raise PreventUpdate
 
@@ -700,7 +695,11 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
     rr_tire_data_records = rr_tire_df.to_dict('records')
 
     # Aero Data
-    aero_data_new = {}
+    aero_data_new = {
+        'Front Wing': front_wing,
+        'Rear Wing': rear_wing,
+        'Under Tray': under_tray
+    }
     if aero_data is None or aero_data == []:
         aero_df = pd.DataFrame([aero_data_new])
     else:
@@ -781,16 +780,18 @@ def save_data(n_clicks, session, date, venue, event, driver, weight, driver_note
         State('fr-tire-table', 'data'),
         State('rl-tire-table', 'data'),
         State('rr-tire-table', 'data'),
+        State('aero-table', 'data'),
         State('suspension-table', 'data'),
         State('notes-table', 'data')
     ],
     prevent_initial_call=True
 )
-def export_data(n_clicks, general_data, fl_tire_data, fr_tire_data, rl_tire_data, rr_tire_data, suspension_data, notes_data):
+def export_data(n_clicks, general_data, fl_tire_data, fr_tire_data, rl_tire_data, rr_tire_data, areo_data, suspension_data, notes_data):
     if not n_clicks:
         raise PreventUpdate
 
     general_df = pd.DataFrame(general_data)
+    areo_df = pd.DataFrame(areo_data)
     suspension_df = pd.DataFrame(suspension_data)
     notes_df = pd.DataFrame(notes_data)
 
@@ -807,6 +808,7 @@ def export_data(n_clicks, general_data, fl_tire_data, fr_tire_data, rl_tire_data
     with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
         general_df.to_excel(writer, sheet_name='General', index=False)
         tire_df.to_excel(writer, sheet_name='Tires', index=False)
+        areo_df.to_excel(writer, sheet_name='Areo', index=False)
         suspension_df.to_excel(writer, sheet_name='Suspension', index=False)
         notes_df.to_excel(writer, sheet_name='Notes', index=False)
 
