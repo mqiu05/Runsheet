@@ -188,14 +188,41 @@ def save_data(n_clicks, session, date, venue, event, driver, weight,
               aero_cols, aero_data,
               susp_cols, susp_data,
               notes_cols, notes_data):
+
     if not n_clicks:
         raise PreventUpdate
 
-    # Example validation: require a valid Session number
+    # Session is mandatory: if empty, display error dialog instead of saving
     if not session:
-        # Could show some dialog or just skip saving
-        raise PreventUpdate
+        return (
+            PreventUpdate, PreventUpdate,  # general table
+            PreventUpdate, PreventUpdate,  # tire table
+            PreventUpdate, PreventUpdate,  # aero table
+            PreventUpdate, PreventUpdate,  # suspension table
+            PreventUpdate, PreventUpdate,  # notes table
+            True                   # session-error => displayed
+        )
 
+    # For every other field, autofill with '' if None
+    date = date or ''
+    venue = venue or ''
+    event = event or ''
+    driver = driver or ''
+    weight = weight or ''       # If blank or None, store as ''
+    tire_compound = tire_compound or ''
+    tire_set = tire_set or ''
+    front_wing = front_wing or ''
+    under_tray = under_tray or ''
+    rear_wing = rear_wing or ''
+    front_spring = front_spring or ''
+    rear_spring = rear_spring or ''
+    right_arb = right_arb or ''
+    left_arb = left_arb or ''
+    faults = faults or ''
+    improvements = improvements or ''
+    misc = misc or ''
+
+    # Build the new rows for each category
     new_general_row = {
         'Session': session,
         'Date': date,
@@ -205,72 +232,68 @@ def save_data(n_clicks, session, date, venue, event, driver, weight,
         'Weight': weight,
     }
 
+    # GENERAL TABLE
     if not general_data:
         general_df = pd.DataFrame([new_general_row])
     else:
         general_df = pd.DataFrame(general_data)
         general_df = pd.concat([general_df, pd.DataFrame([new_general_row])], ignore_index=True)
-
     general_cols = [{'name': c, 'id': c, 'editable': True} for c in general_df.columns]
     general_data = general_df.to_dict('records')
 
+    # TIRE TABLE
     new_tire_row = {
         'Tire Compound': tire_compound,
         'Tire Set': tire_set,
     }
-
     if not tire_data:
         tire_df = pd.DataFrame([new_tire_row])
     else:
         tire_df = pd.DataFrame(tire_data)
         tire_df = pd.concat([tire_df, pd.DataFrame([new_tire_row])], ignore_index=True)
-
     tire_cols = [{'name': c, 'id': c, 'editable': True} for c in tire_df.columns]
     tire_data = tire_df.to_dict('records')
 
+    # AERO TABLE
     new_aero_row = {
         'Front Wing': front_wing,
         'Under Tray': under_tray,
         'Rear Wing': rear_wing,
     }
-
     if not aero_data:
         aero_df = pd.DataFrame([new_aero_row])
     else:
         aero_df = pd.DataFrame(aero_data)
         aero_df = pd.concat([aero_df, pd.DataFrame([new_aero_row])], ignore_index=True)
-
     aero_cols = [{'name': c, 'id': c, 'editable': True} for c in aero_df.columns]
     aero_data = aero_df.to_dict('records')
 
+    # SUSPENSION TABLE
     new_susp_row = {
         'Front Spring Rate': front_spring,
         'Rear Spring Rate': rear_spring,
         'Right ARB': right_arb,
         'Left ARB': left_arb,
     }
-
     if not susp_data:
         susp_df = pd.DataFrame([new_susp_row])
     else:
         susp_df = pd.DataFrame(susp_data)
         susp_df = pd.concat([susp_df, pd.DataFrame([new_susp_row])], ignore_index=True)
-
     susp_cols = [{'name': c, 'id': c, 'editable': True} for c in susp_df.columns]
     susp_data = susp_df.to_dict('records')
 
+    # NOTES TABLE
     new_notes_row = {
         'Faults': faults,
         'Improvements': improvements,
         'Misc': misc,
     }
-
     if not notes_data:
         notes_df = pd.DataFrame([new_notes_row])
     else:
         notes_df = pd.DataFrame(notes_data)
         notes_df = pd.concat([notes_df, pd.DataFrame([new_notes_row])], ignore_index=True)
-
     notes_cols = [{'name': c, 'id': c, 'editable': True} for c in notes_df.columns]
     notes_data = notes_df.to_dict('records')
 
@@ -279,7 +302,8 @@ def save_data(n_clicks, session, date, venue, event, driver, weight,
         tire_cols, tire_data,
         aero_cols, aero_data,
         susp_cols, susp_data,
-        notes_cols, notes_data
+        notes_cols, notes_data,
+        False   # Hide the session-error dialog
     )
 
 
