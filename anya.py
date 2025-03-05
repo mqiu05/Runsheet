@@ -246,7 +246,7 @@ app.layout = dbc.Container([
         Output('faults', 'value'),
         Output('improvements', 'value'),
         Output('misc', 'value'),
-    ],
+    ] ,
     Input('clear-button', 'n_clicks'),
     prevent_initial_call=True
 )
